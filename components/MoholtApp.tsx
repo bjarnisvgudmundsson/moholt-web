@@ -147,7 +147,7 @@ function HeilsufarsmatPage() {
     // Sort dims by score asc for recs
     const sortedDims=Object.entries(dims).sort((a: any, b: any)=>a[1].pct-b[1].pct);
     const recs=sortedDims.slice(0,3).map(([k,d]: [string, any])=>{
-      const recMap={A:{t:"Ferla- og verkflæðisgreining",b:"Ráðfærst er við ferlaskjölun og skilgreiningu á helstu triggers, stigmögnun og handanfaramódeli."},B:{t:"Gagna- og leitarúttekt",b:"Farið er yfir uppbyggingu gagnasafna, leitarlykla og samþætting við önnur kerfi."},C:{t:"Reglufylgni og öryggisskoðun",b:"Farið er yfir RBAC-uppbyggingu, audit-trail og GDPR-ferla."},D:{t:"Tækniáætlun og gervigreindarmat",b:"Mat á núverandi tæknigrunni og tillögur um næstu skref í sjálfvirkni og AI-samþættingu."}};
+      const recMap: any={A:{t:"Ferla- og verkflæðisgreining",b:"Ráðfærst er við ferlaskjölun og skilgreiningu á helstu triggers, stigmögnun og handanfaramódeli."},B:{t:"Gagna- og leitarúttekt",b:"Farið er yfir uppbyggingu gagnasafna, leitarlykla og samþætting við önnur kerfi."},C:{t:"Reglufylgni og öryggisskoðun",b:"Farið er yfir RBAC-uppbyggingu, audit-trail og GDPR-ferla."},D:{t:"Tækniáætlun og gervigreindarmat",b:"Mat á núverandi tæknigrunni og tillögur um næstu skref í sjálfvirkni og AI-samþættingu."}};
       return recMap[k];
     });
     // Insights
