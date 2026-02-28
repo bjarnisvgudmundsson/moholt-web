@@ -126,9 +126,9 @@ function ByrdingFlow({ flow, onBack }: { flow: any; onBack: () => void }) {
    ═══════════════════════════════════════════════════════════════ */
 function HeilsufarsmatPage() {
   const [phase,setPhase]=useState("intro"); // intro | quiz | results
-  const [answers,setAnswers]=useState({});
-  const [results,setResults]=useState(null);
-  const [notes,setNotes]=useState({});
+  const [answers,setAnswers]=useState<Record<number, number>>({});
+  const [results,setResults]=useState<any>(null);
+  const [notes,setNotes]=useState<Record<number, string>>({});
   const totalQ=20;
   const answered=Object.keys(answers).length;
 
