@@ -470,7 +470,7 @@ function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | nul
       <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:16 }}>Verkáfangar</h3>
       <div style={{ display:"flex", gap:0, marginBottom:32 }}>{pkg.phases.map((ph: any, i: number)=>(<div key={i} style={{ flex:1 }}><div style={{ height:4, background:i===0?pkg.color:"#e2e8f0", borderRadius:i===0?"2px 0 0 2px":i===pkg.phases.length-1?"0 2px 2px 0":0 }} /><div style={{ fontSize:12, fontWeight:500, color:"#64748b", marginTop:8, paddingRight:8 }}>{ph}</div></div>))}</div>
       <div style={{ display:"flex", gap:12, marginBottom:32 }}>
-        {BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id))&&<button onClick={()=>{const f=BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id));nav("byrding",f.slug);}} style={{ padding:"12px 24px", background:pkg.color, color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>Hefja byrðingu →</button>}
+        {BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id))&&<button onClick={()=>{const f=BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id));if(f)nav("byrding",f.slug);}} style={{ padding:"12px 24px", background:pkg.color, color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>Hefja byrðingu →</button>}
         <button onClick={()=>setCsat(!csat)} style={{ padding:"12px 24px", background:"white", color:"#64748b", border:"1px solid #d1d5db", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>{csat?"Fela endurgjöf":"Gefa endurgjöf"}</button>
       </div>
       {csat&&<CSATWidget context="service" contextId={pkg.id} contextTitle={pkg.title} onClose={()=>setCsat(false)} />}
@@ -539,9 +539,9 @@ function ByrdingPage({ nav, slug }: { nav: (page: string, param?: string | null)
    ═══════════════════════════════════════════════════════════════ */
 export default function MoholtApp() {
   const [route,setRoute]=useState("home");
-  const [param,setParam]=useState(null);
+  const [param,setParam]=useState<string | null>(null);
   const [menuOpen,setMenuOpen]=useState(false);
-  const nav=useCallback((pg,p=null)=>{setRoute(pg);setParam(p);setMenuOpen(false);window.scrollTo(0,0);},[]);
+  const nav=useCallback((pg: string, p: string | null = null)=>{setRoute(pg);setParam(p);setMenuOpen(false);window.scrollTo(0,0);},[]);
   const items=[{id:"home",l:"Forsíða"},{id:"thjonusta",l:"Þjónusta"},{id:"heilsufarsmat",l:"Heilsufarsmat"},{id:"byrding",l:"Byrðing"},{id:"retainer",l:"Samningar"},{id:"um",l:"Um okkur"}];
 
   return (
