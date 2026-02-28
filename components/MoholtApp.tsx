@@ -136,7 +136,7 @@ function HeilsufarsmatPage() {
   const setNote=(qId: number, txt: string)=>{setNotes(p=>({...p,[qId]:txt}));};
 
   const calculate=()=>{
-    const total=Object.values(answers).reduce((a: number, b: number)=>a+b,0);
+    const total=(Object.values(answers) as number[]).reduce((a: number, b: number)=>a+b,0);
     const level=MATURITY_LEVELS.find((l: any)=>total>=l.min&&total<=l.max)||MATURITY_LEVELS[0];
     const dims: any={};
     ASSESSMENT_SECTIONS.forEach((sec: any)=>{
