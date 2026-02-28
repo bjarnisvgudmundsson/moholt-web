@@ -1,0 +1,15 @@
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Söhne', 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #fafafa;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+a { color: inherit; }
