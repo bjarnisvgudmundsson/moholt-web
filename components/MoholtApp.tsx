@@ -24,11 +24,11 @@ function CookieBanner() {
 /* ═══════════════════════════════════════════════════════════════
    CSAT WIDGET — reusable
    ═══════════════════════════════════════════════════════════════ */
-function CSATWidget({ context, contextId, contextTitle, onClose }) {
-  const [answers, setAnswers] = useState({});
+function CSATWidget({ context, contextId, contextTitle, onClose }: { context: string; contextId: string; contextTitle: string; onClose?: () => void }) {
+  const [answers, setAnswers] = useState<Record<string, any>>({});
   const [submitted, setSubmitted] = useState(false);
   const qs = CSAT_Q[context] || CSAT_Q.service;
-  const set = (id,v) => setAnswers(p=>({...p,[id]:v}));
+  const set = (id: string, v: any) => setAnswers(p=>({...p,[id]:v}));
   if (submitted) return (
     <div style={{ background:"#f0fdf4", border:"1px solid #bbf7d0", borderRadius:12, padding:32, textAlign:"center" }}>
       <div style={{ fontSize:32, marginBottom:12 }}>✓</div>
@@ -61,12 +61,12 @@ function CSATWidget({ context, contextId, contextTitle, onClose }) {
 /* ═══════════════════════════════════════════════════════════════
    BYRÐING FLOW
    ═══════════════════════════════════════════════════════════════ */
-function ByrdingFlow({ flow, onBack }) {
-  const [cur,setCur]=useState(0);const [checks,setChecks]=useState({});const [showCSAT,setShowCSAT]=useState(false);
+function ByrdingFlow({ flow, onBack }: { flow: any; onBack: () => void }) {
+  const [cur,setCur]=useState(0);const [checks,setChecks]=useState<Record<string, boolean>>({});const [showCSAT,setShowCSAT]=useState(false);
   const step=flow.steps[cur];const done=cur>=flow.steps.length;
-  const toggle=(si,ii)=>{const k=`${si}-${ii}`;setChecks(p=>({...p,[k]:!p[k]}));};
-  const prog=(si)=>{const s=flow.steps[si];const t=s.checklist.length;const d=s.checklist.filter((_,i)=>checks[`${si}-${i}`]).length;return{d,t};};
-  const reqOk=()=>done||step.checklist.every((c,i)=>!c.required||checks[`${cur}-${i}`]);
+  const toggle=(si: number, ii: number)=>{const k=`${si}-${ii}`;setChecks(p=>({...p,[k]:!p[k]}));};
+  const prog=(si: number)=>{const s=flow.steps[si];const t=s.checklist.length;const d=s.checklist.filter((_: any,i: number)=>checks[`${si}-${i}`]).length;return{d,t};};
+  const reqOk=()=>done||step.checklist.every((c: any, i: number)=>!c.required||checks[`${cur}-${i}`]);
 
   if(done) return (
     <div>
@@ -394,7 +394,7 @@ function SkilmalarPage() {
    (same as before but with Heilsufarsmat button on home)
    ═══════════════════════════════════════════════════════════════ */
 
-function HomePage({ nav }) {
+function HomePage({ nav }: { nav: (page: string, param?: string | null) => void }) {
   return (
     <div>
       <div style={{ textAlign:"center", padding:"56px 24px 48px", position:"relative" }}>
@@ -445,7 +445,7 @@ function HomePage({ nav }) {
   );
 }
 
-function ThjonustuPage({ nav, slug }) {
+function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | null) => void; slug: string | null }) {
   const [pkg,setPkg]=useState(slug?SERVICE_PACKAGES.find(p=>p.slug===slug):null);
   const [csat,setCsat]=useState(false);
   const [filter,setFilter]=useState("all");
@@ -518,7 +518,7 @@ function RetainerPage() {
   );
 }
 
-function ByrdingPage({ nav, slug }) {
+function ByrdingPage({ nav, slug }: { nav: (page: string, param?: string | null) => void; slug: string | null }) {
   const [flow,setFlow]=useState(slug?BYRDING_FLOWS.find(b=>b.slug===slug):null);
   if(flow) return <ByrdingFlow flow={flow} onBack={()=>setFlow(null)} />;
   return (
