@@ -44,11 +44,11 @@ function CSATWidget({ context, contextId, contextTitle, onClose }: { context: st
         <div style={{ fontFamily:FF, fontSize:18 }}>{contextTitle}</div>
       </div>
       <div style={{ padding:24, display:"flex", flexDirection:"column", gap:20 }}>
-        {qs.map(q=>(
+        {qs.map((q: any)=>(
           <div key={q.id}>
             <label style={{ display:"block", fontWeight:500, fontSize:14, marginBottom:8, color:"#334155" }}>{q.label}</label>
-            {q.type==="rating"&&<div style={{ display:"flex", gap:6 }}>{[1,2,3,4,5].map(n=><button key={n} onClick={()=>set(q.id,n)} style={{ width:40, height:40, borderRadius:8, border:answers[q.id]===n?"2px solid #2563eb":"1px solid #d1d5db", background:answers[q.id]===n?"#eff6ff":"white", cursor:"pointer", fontWeight:600, fontSize:15, color:answers[q.id]===n?"#2563eb":"#64748b" }}>{n}</button>)}</div>}
-            {q.type==="nps"&&<div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>{[0,1,2,3,4,5,6,7,8,9,10].map(n=><button key={n} onClick={()=>set(q.id,n)} style={{ width:36, height:36, borderRadius:8, border:answers[q.id]===n?"2px solid #2563eb":"1px solid #d1d5db", background:answers[q.id]===n?"#eff6ff":n<=6?"#fef2f2":n<=8?"#fffbeb":"#f0fdf4", cursor:"pointer", fontSize:13, fontWeight:500, color:answers[q.id]===n?"#2563eb":"#64748b" }}>{n}</button>)}</div>}
+            {q.type==="rating"&&<div style={{ display:"flex", gap:6 }}>{[1,2,3,4,5].map((n: number)=><button key={n} onClick={()=>set(q.id,n)} style={{ width:40, height:40, borderRadius:8, border:answers[q.id]===n?"2px solid #2563eb":"1px solid #d1d5db", background:answers[q.id]===n?"#eff6ff":"white", cursor:"pointer", fontWeight:600, fontSize:15, color:answers[q.id]===n?"#2563eb":"#64748b" }}>{n}</button>)}</div>}
+            {q.type==="nps"&&<div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>{[0,1,2,3,4,5,6,7,8,9,10].map((n: number)=><button key={n} onClick={()=>set(q.id,n)} style={{ width:36, height:36, borderRadius:8, border:answers[q.id]===n?"2px solid #2563eb":"1px solid #d1d5db", background:answers[q.id]===n?"#eff6ff":n<=6?"#fef2f2":n<=8?"#fffbeb":"#f0fdf4", cursor:"pointer", fontSize:13, fontWeight:500, color:answers[q.id]===n?"#2563eb":"#64748b" }}>{n}</button>)}</div>}
             {q.type==="text"&&<textarea value={answers[q.id]||""} onChange={e=>set(q.id,e.target.value)} rows={3} placeholder="Frjáls athugasemd..." style={{ width:"100%", borderRadius:8, border:"1px solid #d1d5db", padding:"10px 12px", fontSize:14, resize:"vertical", fontFamily:"inherit", boxSizing:"border-box" }} />}
           </div>
         ))}
@@ -88,7 +88,7 @@ function ByrdingFlow({ flow, onBack }: { flow: any; onBack: () => void }) {
         <p style={{ color:"#64748b" }}>{flow.tagline}</p>
       </div>
       <div style={{ display:"flex", gap:8, marginBottom:32 }}>
-        {flow.steps.map((s,i)=>{const p=prog(i);const ic=i===cur;const id=i<cur;return(
+        {flow.steps.map((s: any, i: number)=>{const p=prog(i);const ic=i===cur;const id=i<cur;return(
           <div key={i} onClick={()=>i<=cur&&setCur(i)} style={{ flex:1, cursor:i<=cur?"pointer":"default", opacity:i>cur?.4:1 }}>
             <div style={{ height:4, borderRadius:2, background:id?"#22c55e":ic?"#2563eb":"#e2e8f0", marginBottom:8 }} />
             <div style={{ fontSize:12, fontWeight:600, color:ic?"#2563eb":id?"#22c55e":"#94a3b8" }}>Skref {i+1}: {s.title}</div>
@@ -102,7 +102,7 @@ function ByrdingFlow({ flow, onBack }: { flow: any; onBack: () => void }) {
           <p style={{ color:"#64748b", fontSize:14 }}>{step.description}</p>
         </div>
         <div style={{ padding:24 }}>
-          {step.checklist.map((c,i)=>{const ch=!!checks[`${cur}-${i}`];return(
+          {step.checklist.map((c: any, i: number)=>{const ch=!!checks[`${cur}-${i}`];return(
             <label key={i} onClick={()=>toggle(cur,i)} style={{ display:"flex", alignItems:"flex-start", gap:12, padding:"12px 0", borderBottom:i<step.checklist.length-1?"1px solid #f1f5f9":"none", cursor:"pointer" }}>
               <div style={{ width:22, height:22, borderRadius:6, border:ch?"none":"2px solid #d1d5db", background:ch?"#2563eb":"white", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"white", fontSize:13 }}>{ch&&"✓"}</div>
               <div><span style={{ fontWeight:500, color:ch?"#94a3b8":"#1e293b", textDecoration:ch?"line-through":"none" }}>{c.item}</span>
@@ -136,17 +136,17 @@ function HeilsufarsmatPage() {
   const setNote=(qId,txt)=>{setNotes(p=>({...p,[qId]:txt}));};
 
   const calculate=()=>{
-    const total=Object.values(answers).reduce((a,b)=>a+b,0);
-    const level=MATURITY_LEVELS.find(l=>total>=l.min&&total<=l.max)||MATURITY_LEVELS[0];
-    const dims={};
-    ASSESSMENT_SECTIONS.forEach(sec=>{
-      const score=sec.questions.reduce((s,q)=>s+(answers[q.id]||0),0);
+    const total=Object.values(answers).reduce((a: number, b: number)=>a+b,0);
+    const level=MATURITY_LEVELS.find((l: any)=>total>=l.min&&total<=l.max)||MATURITY_LEVELS[0];
+    const dims: any={};
+    ASSESSMENT_SECTIONS.forEach((sec: any)=>{
+      const score=sec.questions.reduce((s: number, q: any)=>s+(answers[q.id]||0),0);
       const max=sec.questions.length*4;
       dims[sec.key]={name:sec.name,score,max,pct:Math.round((score/max)*100),color:sec.color};
     });
     // Sort dims by score asc for recs
-    const sortedDims=Object.entries(dims).sort((a,b)=>a[1].pct-b[1].pct);
-    const recs=sortedDims.slice(0,3).map(([k,d])=>{
+    const sortedDims=Object.entries(dims).sort((a: any, b: any)=>a[1].pct-b[1].pct);
+    const recs=sortedDims.slice(0,3).map(([k,d]: [string, any])=>{
       const recMap={A:{t:"Ferla- og verkflæðisgreining",b:"Ráðfærst er við ferlaskjölun og skilgreiningu á helstu triggers, stigmögnun og handanfaramódeli."},B:{t:"Gagna- og leitarúttekt",b:"Farið er yfir uppbyggingu gagnasafna, leitarlykla og samþætting við önnur kerfi."},C:{t:"Reglufylgni og öryggisskoðun",b:"Farið er yfir RBAC-uppbyggingu, audit-trail og GDPR-ferla."},D:{t:"Tækniáætlun og gervigreindarmat",b:"Mat á núverandi tæknigrunni og tillögur um næstu skref í sjálfvirkni og AI-samþættingu."}};
       return recMap[k];
     });
@@ -171,7 +171,7 @@ function HeilsufarsmatPage() {
       <h2 style={{ fontFamily:FF, fontSize:36, color:"#0f172a", marginBottom:12 }}>Hversu þroskuð er málastjórnun þín?</h2>
       <p style={{ color:"#64748b", maxWidth:520, margin:"0 auto 32px", lineHeight:1.7 }}>15 mínútna mat sem gefur þér skýra mynd af þroskaþrepi, veikleikum og forgangsröðun – án skuldbindingar.</p>
       <div style={{ display:"flex", justifyContent:"center", gap:32, marginBottom:40, flexWrap:"wrap" }}>
-        {[{n:"15 mín",l:"meðaltími"},{n:"20",l:"spurningar"},{n:"5",l:"þroskaþrep"},{n:"Ókeypis",l:"án skuldbindingar"}].map((s,i)=>(
+        {[{n:"15 mín",l:"meðaltími"},{n:"20",l:"spurningar"},{n:"5",l:"þroskaþrep"},{n:"Ókeypis",l:"án skuldbindingar"}].map((s: any, i: number)=>(
           <div key={i} style={{ textAlign:"center" }}>
             <div style={{ fontFamily:FF, fontSize:28, color:"#1e293b" }}>{s.n}</div>
             <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:1 }}>{s.l}</div>
@@ -194,17 +194,17 @@ function HeilsufarsmatPage() {
           <p style={{ color:"rgba(255,255,255,.6)", maxWidth:500, margin:"0 auto", fontSize:14 }}>{R.level.desc}</p>
           {/* Gauge */}
           <div style={{ display:"flex", maxWidth:400, margin:"24px auto 0", gap:2 }}>
-            {MATURITY_LEVELS.map((_,i)=>(
+            {MATURITY_LEVELS.map((_: any, i: number)=>(
               <div key={i} style={{ flex:1, height:6, borderRadius:3, background:i<R.levelIdx?"#c8a96e":i===R.levelIdx?"rgba(200,169,110,.5)":"rgba(255,255,255,.1)" }} />
             ))}
           </div>
           <div style={{ display:"flex", justifyContent:"space-between", maxWidth:400, margin:"6px auto 0" }}>
-            {MATURITY_LEVELS.map((l,i)=><span key={i} style={{ fontSize:9, color:"rgba(255,255,255,.35)", textTransform:"uppercase" }}>{l.label}</span>)}
+            {MATURITY_LEVELS.map((l: any, i: number)=><span key={i} style={{ fontSize:9, color:"rgba(255,255,255,.35)", textTransform:"uppercase" }}>{l.label}</span>)}
           </div>
         </div>
         {/* Dimension cards */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:32 }}>
-          {Object.entries(R.dims).map(([k,d])=>(
+          {Object.entries(R.dims).map(([k,d]: [string, any])=>(
             <div key={k} style={{ ...card }}>
               <div style={{ fontSize:12, fontWeight:600, color:"#64748b", marginBottom:8 }}>{k} · {d.name}</div>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
@@ -222,7 +222,7 @@ function HeilsufarsmatPage() {
         {/* Insights */}
         <h3 style={{ fontFamily:FF, fontSize:20, marginBottom:16 }}>Helstu niðurstöður</h3>
         <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
-          {R.insights.map((ins,i)=>(
+          {R.insights.map((ins: any, i: number)=>(
             <div key={i} style={{ ...card, display:"flex", gap:16, alignItems:"flex-start" }}>
               <div style={{ width:36, height:36, borderRadius:8, background:ins.cls==="warn"?"#fef2f2":ins.cls==="ok"?"#f0fdf4":"#eff6ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{ins.icon}</div>
               <div><strong style={{ fontSize:14 }}>{ins.t}</strong><p style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{ins.b}</p></div>
@@ -232,7 +232,7 @@ function HeilsufarsmatPage() {
         {/* Recs */}
         <h3 style={{ fontFamily:FF, fontSize:20, marginBottom:16 }}>Forgangsráðleggingar frá Móholt</h3>
         <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
-          {R.recs.map((r,i)=>(
+          {R.recs.map((r: any, i: number)=>(
             <div key={i} style={{ ...card, display:"flex", gap:16, alignItems:"flex-start" }}>
               <div style={{ fontFamily:FF, fontSize:24, color:"#c8a96e", fontWeight:700, flexShrink:0, width:32 }}>0{i+1}</div>
               <div><strong style={{ fontSize:14 }}>{r.t}</strong><p style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{r.b}</p></div>
@@ -265,19 +265,19 @@ function HeilsufarsmatPage() {
         <span style={{ fontSize:12, fontWeight:600, color:"#2563eb", minWidth:36, textAlign:"right" }}>{answered}/{totalQ}</span>
       </div>
 
-      {ASSESSMENT_SECTIONS.map(sec=>(
+      {ASSESSMENT_SECTIONS.map((sec: any)=>(
         <div key={sec.key}>
           <div style={{ display:"flex", alignItems:"flex-end", gap:14, marginTop:40, marginBottom:8, paddingBottom:12, borderBottom:"1px solid #e2e8f0" }}>
             <span style={{ fontFamily:FF, fontSize:36, color:"#cbd5e1", lineHeight:1 }}>{sec.key}</span>
             <span style={{ fontFamily:FF, fontSize:20 }}>{sec.name}</span>
           </div>
           <p style={{ fontSize:13, color:"#64748b", marginBottom:24 }}>{sec.desc}</p>
-          {sec.questions.map(q=>(
+          {sec.questions.map((q: any)=>(
             <div key={q.id} style={{ ...card, marginBottom:12 }}>
               <div style={{ fontSize:11, fontFamily:FF, color:"#94a3b8", letterSpacing:1, marginBottom:8 }}>{String(q.id).padStart(2,"0")} / 20</div>
               <p style={{ fontSize:14, fontWeight:500, marginBottom:16, lineHeight:1.5 }}>{q.text}</p>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                {q.opts.map((opt,oi)=>{const val=oi+1;const sel=answers[q.id]===val;return(
+                {q.opts.map((opt: any, oi: number)=>{const val=oi+1;const sel=answers[q.id]===val;return(
                   <div key={oi}>
                     <div onClick={()=>selectAnswer(q.id,val)} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 14px", border:`1px solid ${sel?"#1e293b":"#e2e8f0"}`, borderRadius:sel&&opt.explain?"4px 4px 0 0":"4px", cursor:"pointer", background:sel?"rgba(30,41,59,.04)":"white", transition:"all .15s" }}>
                       <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${sel?"#1e293b":"#d1d5db"}`, background:sel?"#1e293b":"white", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -412,7 +412,7 @@ function HomePage({ nav }: { nav: (page: string, param?: string | null) => void 
       <div style={{ marginBottom:48 }}>
         <h2 style={{ fontFamily:FF, fontSize:24, marginBottom:24 }}>Þjónustupakkar</h2>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:16 }}>
-          {SERVICE_PACKAGES.slice(0,4).map(p=>(
+          {SERVICE_PACKAGES.slice(0,4).map((p: any)=>(
             <div key={p.id} onClick={()=>nav("thjonusta",p.slug)} style={{ ...card, cursor:"pointer" }} onMouseEnter={e=>hoverCard(e)} onMouseLeave={unhoverCard}>
               <div style={{ fontSize:11, color:"#94a3b8", fontWeight:600, marginBottom:8 }}>{p.id}</div>
               <h3 style={{ fontFamily:FF, fontSize:18, color:"#1e293b", marginBottom:6 }}>{p.title}</h3>
@@ -446,11 +446,11 @@ function HomePage({ nav }: { nav: (page: string, param?: string | null) => void 
 }
 
 function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | null) => void; slug: string | null }) {
-  const [pkg,setPkg]=useState(slug?SERVICE_PACKAGES.find(p=>p.slug===slug):null);
+  const [pkg,setPkg]=useState(slug?SERVICE_PACKAGES.find((p: any)=>p.slug===slug):null);
   const [csat,setCsat]=useState(false);
   const [filter,setFilter]=useState("all");
   const cats=[{id:"all",l:"Allt"},{id:"ai",l:"AI & Greining"},{id:"compliance",l:"Reglufylgni"},{id:"ux",l:"UX & Samþætting"},{id:"advisory",l:"Ráðgjöf"}];
-  const list=filter==="all"?SERVICE_PACKAGES:SERVICE_PACKAGES.filter(p=>p.category===filter);
+  const list=filter==="all"?SERVICE_PACKAGES:SERVICE_PACKAGES.filter((p: any)=>p.category===filter);
 
   if(pkg) return (
     <div>
@@ -466,11 +466,11 @@ function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | nul
         <div style={{ background:"#f8fafc", borderRadius:12, padding:24 }}><div style={{ fontSize:12, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:8 }}>Tímarammi</div><div style={{ fontFamily:FF, fontSize:22, color:"#1e293b" }}>{pkg.duration}</div></div>
       </div>
       <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:16 }}>Afurðir</h3>
-      <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:32 }}>{pkg.deliverables.map((d,i)=>(<div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}><div style={{ width:20, height:20, borderRadius:6, background:pkg.color+"18", color:pkg.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, flexShrink:0, marginTop:2 }}>{i+1}</div><span style={{ fontSize:14, color:"#334155", lineHeight:1.5 }}>{d}</span></div>))}</div>
+      <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:32 }}>{pkg.deliverables.map((d: any, i: number)=>(<div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}><div style={{ width:20, height:20, borderRadius:6, background:pkg.color+"18", color:pkg.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, flexShrink:0, marginTop:2 }}>{i+1}</div><span style={{ fontSize:14, color:"#334155", lineHeight:1.5 }}>{d}</span></div>))}</div>
       <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:16 }}>Verkáfangar</h3>
-      <div style={{ display:"flex", gap:0, marginBottom:32 }}>{pkg.phases.map((ph,i)=>(<div key={i} style={{ flex:1 }}><div style={{ height:4, background:i===0?pkg.color:"#e2e8f0", borderRadius:i===0?"2px 0 0 2px":i===pkg.phases.length-1?"0 2px 2px 0":0 }} /><div style={{ fontSize:12, fontWeight:500, color:"#64748b", marginTop:8, paddingRight:8 }}>{ph}</div></div>))}</div>
+      <div style={{ display:"flex", gap:0, marginBottom:32 }}>{pkg.phases.map((ph: any, i: number)=>(<div key={i} style={{ flex:1 }}><div style={{ height:4, background:i===0?pkg.color:"#e2e8f0", borderRadius:i===0?"2px 0 0 2px":i===pkg.phases.length-1?"0 2px 2px 0":0 }} /><div style={{ fontSize:12, fontWeight:500, color:"#64748b", marginTop:8, paddingRight:8 }}>{ph}</div></div>))}</div>
       <div style={{ display:"flex", gap:12, marginBottom:32 }}>
-        {BYRDING_FLOWS.find(b=>b.forPackages.includes(pkg.id))&&<button onClick={()=>{const f=BYRDING_FLOWS.find(b=>b.forPackages.includes(pkg.id));nav("byrding",f.slug);}} style={{ padding:"12px 24px", background:pkg.color, color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>Hefja byrðingu →</button>}
+        {BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id))&&<button onClick={()=>{const f=BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id));nav("byrding",f.slug);}} style={{ padding:"12px 24px", background:pkg.color, color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>Hefja byrðingu →</button>}
         <button onClick={()=>setCsat(!csat)} style={{ padding:"12px 24px", background:"white", color:"#64748b", border:"1px solid #d1d5db", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>{csat?"Fela endurgjöf":"Gefa endurgjöf"}</button>
       </div>
       {csat&&<CSATWidget context="service" contextId={pkg.id} contextTitle={pkg.title} onClose={()=>setCsat(false)} />}
@@ -484,9 +484,9 @@ function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | nul
         <h2 style={{ fontFamily:FF, fontSize:32, color:"#0f172a", marginBottom:8 }}>Þjónustupakkar</h2>
         <p style={{ color:"#64748b", maxWidth:520 }}>Veldu þann pakka sem hentar best. Allir pakkar innihalda AI-aukningu og skýrar afurðir.</p>
       </div>
-      <div style={{ display:"flex", gap:8, marginBottom:24, flexWrap:"wrap" }}>{cats.map(c=>(<button key={c.id} onClick={()=>setFilter(c.id)} style={{ padding:"6px 16px", borderRadius:20, border:"1px solid", fontSize:13, fontWeight:500, cursor:"pointer", borderColor:filter===c.id?"#2563eb":"#e2e8f0", background:filter===c.id?"#eff6ff":"white", color:filter===c.id?"#2563eb":"#64748b" }}>{c.l}</button>))}</div>
+      <div style={{ display:"flex", gap:8, marginBottom:24, flexWrap:"wrap" }}>{cats.map((c: any)=>(<button key={c.id} onClick={()=>setFilter(c.id)} style={{ padding:"6px 16px", borderRadius:20, border:"1px solid", fontSize:13, fontWeight:500, cursor:"pointer", borderColor:filter===c.id?"#2563eb":"#e2e8f0", background:filter===c.id?"#eff6ff":"white", color:filter===c.id?"#2563eb":"#64748b" }}>{c.l}</button>))}</div>
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16 }}>
-        {list.map(p=>(<div key={p.id} onClick={()=>setPkg(p)} style={{ ...card, cursor:"pointer" }} onMouseEnter={e=>hoverCard(e)} onMouseLeave={unhoverCard}>
+        {list.map((p: any)=>(<div key={p.id} onClick={()=>setPkg(p)} style={{ ...card, cursor:"pointer" }} onMouseEnter={e=>hoverCard(e)} onMouseLeave={unhoverCard}>
           <div style={{ fontSize:11, color:"#94a3b8", fontWeight:600, marginBottom:12 }}>{p.id}</div>
           <h3 style={{ fontFamily:FF, fontSize:18, color:"#1e293b", marginBottom:6 }}>{p.title}</h3>
           <p style={{ fontSize:13, color:"#64748b", lineHeight:1.5, marginBottom:16 }}>{p.tagline}</p>
@@ -502,13 +502,13 @@ function RetainerPage() {
   return (
     <div>
       <div style={{ marginBottom:32 }}><div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"#64748b", marginBottom:4 }}>Ráðgjafasamningar</div><h2 style={{ fontFamily:FF, fontSize:32, color:"#0f172a", marginBottom:8 }}>Mánaðarlegir samningar</h2><p style={{ color:"#64748b", maxWidth:520 }}>Stöðugur aðgangur að sérfræðiráðgjöf.</p></div>
-      {RETAINERS.map(r=>(<div key={r.id} style={{ marginBottom:40 }}>
+      {RETAINERS.map((r: any)=>(<div key={r.id} style={{ marginBottom:40 }}>
         <div style={{ marginBottom:20 }}><h3 style={{ fontFamily:FF, fontSize:22, color:"#1e293b" }}>{r.title}</h3><p style={{ fontSize:13, color:"#64748b" }}>{r.tagline}</p></div>
-        <div style={{ display:"grid", gridTemplateColumns:`repeat(${r.tiers.length},1fr)`, gap:16, marginBottom:16 }}>{r.tiers.map((t,i)=>{const pop=i===r.tiers.length-1;return(<div key={i} style={{ ...card, border:pop?"1px solid #1e293b":"1px solid #e2e8f0", position:"relative", overflow:"hidden" }}>{pop&&<div style={{ position:"absolute", top:12, right:-28, background:"#1e293b", color:"white", fontSize:10, fontWeight:700, padding:"3px 32px", transform:"rotate(45deg)", textTransform:"uppercase", letterSpacing:1 }}>Vinsælt</div>}
+        <div style={{ display:"grid", gridTemplateColumns:`repeat(${r.tiers.length},1fr)`, gap:16, marginBottom:16 }}>{r.tiers.map((t: any, i: number)=>{const pop=i===r.tiers.length-1;return(<div key={i} style={{ ...card, border:pop?"1px solid #1e293b":"1px solid #e2e8f0", position:"relative", overflow:"hidden" }}>{pop&&<div style={{ position:"absolute", top:12, right:-28, background:"#1e293b", color:"white", fontSize:10, fontWeight:700, padding:"3px 32px", transform:"rotate(45deg)", textTransform:"uppercase", letterSpacing:1 }}>Vinsælt</div>}
           <div style={{ fontSize:12, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:4 }}>{t.name}</div>
           <div style={{ fontFamily:FF, fontSize:24, color:"#1e293b", marginBottom:4 }}>{t.price}</div>
           <div style={{ fontSize:13, color:r.color, fontWeight:500, marginBottom:16 }}>{t.hours} klst./mán.</div>
-          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>{t.features.map((f,j)=><div key={j} style={{ display:"flex", gap:8, alignItems:"flex-start", fontSize:13, color:"#475569" }}><span style={{ color:r.color, fontWeight:700, flexShrink:0 }}>✓</span>{f}</div>)}</div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>{t.features.map((f: any, j: number)=><div key={j} style={{ display:"flex", gap:8, alignItems:"flex-start", fontSize:13, color:"#475569" }}><span style={{ color:r.color, fontWeight:700, flexShrink:0 }}>✓</span>{f}</div>)}</div>
         </div>);})}</div>
         <button onClick={()=>setCsatId(csatId===r.id?null:r.id)} style={{ padding:"8px 16px", background:"none", border:"1px solid #d1d5db", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:500, color:"#64748b" }}>{csatId===r.id?"Fela":"Gefa endurgjöf"}</button>
         {csatId===r.id&&<div style={{ marginTop:16 }}><CSATWidget context="retainer" contextId={r.id} contextTitle={r.title} onClose={()=>setCsatId(null)} /></div>}
@@ -519,16 +519,16 @@ function RetainerPage() {
 }
 
 function ByrdingPage({ nav, slug }: { nav: (page: string, param?: string | null) => void; slug: string | null }) {
-  const [flow,setFlow]=useState(slug?BYRDING_FLOWS.find(b=>b.slug===slug):null);
+  const [flow,setFlow]=useState(slug?BYRDING_FLOWS.find((b: any)=>b.slug===slug):null);
   if(flow) return <ByrdingFlow flow={flow} onBack={()=>setFlow(null)} />;
   return (
     <div>
       <div style={{ marginBottom:32 }}><div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"#64748b", marginBottom:4 }}>Byrðing</div><h2 style={{ fontFamily:FF, fontSize:32, color:"#0f172a", marginBottom:8 }}>Undirbúningur verkefna</h2><p style={{ color:"#64748b", maxWidth:520, lineHeight:1.6 }}>Byrðing tryggir að verkefni byrji á réttum grunni.</p></div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>{BYRDING_FLOWS.map(f=>(<div key={f.id} onClick={()=>setFlow(f)} style={{ ...card, cursor:"pointer" }} onMouseEnter={e=>hoverCard(e)} onMouseLeave={unhoverCard}>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>{BYRDING_FLOWS.map((f: any)=>(<div key={f.id} onClick={()=>setFlow(f)} style={{ ...card, cursor:"pointer" }} onMouseEnter={e=>hoverCard(e)} onMouseLeave={unhoverCard}>
         <div style={{ fontSize:11, color:"#94a3b8", fontWeight:600, marginBottom:8 }}>{f.id} · Tengist: {f.forPackages.join(", ")}</div>
         <h3 style={{ fontFamily:FF, fontSize:18, color:"#1e293b", marginBottom:6 }}>{f.title}</h3>
         <p style={{ fontSize:13, color:"#64748b", lineHeight:1.5, marginBottom:12 }}>{f.tagline}</p>
-        <div style={{ fontSize:13, color:"#2563eb", fontWeight:500 }}>{f.steps.length} skref · {f.steps.reduce((a,s)=>a+s.checklist.length,0)} atriði →</div>
+        <div style={{ fontSize:13, color:"#2563eb", fontWeight:500 }}>{f.steps.length} skref · {f.steps.reduce((a: number, s: any)=>a+s.checklist.length,0)} atriði →</div>
       </div>))}</div>
     </div>
   );
@@ -555,7 +555,7 @@ export default function MoholtApp() {
           </div>
           {/* Desktop nav */}
           <nav style={{ display:"flex", gap:4 }}>
-            {items.map(i=><button key={i.id} onClick={()=>nav(i.id)} style={{ padding:"6px 12px", borderRadius:6, border:"none", background:route===i.id?"#f1f5f9":"transparent", color:route===i.id?"#1e293b":"#64748b", fontWeight:500, fontSize:13, cursor:"pointer" }}>{i.l}</button>)}
+            {items.map((i: any)=><button key={i.id} onClick={()=>nav(i.id)} style={{ padding:"6px 12px", borderRadius:6, border:"none", background:route===i.id?"#f1f5f9":"transparent", color:route===i.id?"#1e293b":"#64748b", fontWeight:500, fontSize:13, cursor:"pointer" }}>{i.l}</button>)}
           </nav>
         </div>
       </header>
