@@ -132,8 +132,8 @@ function HeilsufarsmatPage() {
   const totalQ=20;
   const answered=Object.keys(answers).length;
 
-  const selectAnswer=(qId,val)=>{setAnswers(p=>({...p,[qId]:val}));};
-  const setNote=(qId,txt)=>{setNotes(p=>({...p,[qId]:txt}));};
+  const selectAnswer=(qId: number, val: number)=>{setAnswers(p=>({...p,[qId]:val}));};
+  const setNote=(qId: number, txt: string)=>{setNotes(p=>({...p,[qId]:txt}));};
 
   const calculate=()=>{
     const total=Object.values(answers).reduce((a: number, b: number)=>a+b,0);
