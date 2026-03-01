@@ -1,7 +1,5 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const TO = "bjarni@moholt.is";
 const FROM = "Móholt Vefsíða <onboarding@resend.dev>"; // Change to noreply@moholt.is after domain verification
 
@@ -12,7 +10,14 @@ interface SendOpts {
 }
 
 export async function sendNotification({ subject, html, replyTo }: SendOpts) {
+  // Check if API key is configured
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not configured - email not sent");
+    return { success: false, error: "RESEND_API_KEY not configured" };
+  }
+
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: TO,
