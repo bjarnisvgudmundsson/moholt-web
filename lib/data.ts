@@ -276,6 +276,217 @@ export const CSAT_Q: Record<string, Array<{id:string;label:string;type:string}>>
   byrding:[{id:"clarity",label:"Skýrleiki leiðbeininga",type:"rating"},{id:"preparation",label:"Undirbúningurinn hjálpaði mér",type:"rating"},{id:"effort",label:"Fyrirhöfn var hófleg",type:"rating"},{id:"comment",label:"Hvað hefði mátt vera öðruvísi?",type:"text"}],
 };
 
+export const WORKSHOPS = [
+  {
+    id: "V01",
+    slug: "gervigreind-i-raun",
+    title: "Gervigreind í Raun",
+    tagline: "Umbreytum gervigreindar möguleikum í hagnýtar lausnir með þínum gögnum",
+    description: "Viðskiptavinir koma með eigin áskoranir og gögn. Saman kortleggjum við möguleika gervigreindar, smíðum fyrstu frumgerð og leggjum grunn að innleiðingu.",
+    format: "Hálfur dagur (4 klst)",
+    price: "425.000 ISK",
+    maxAttendees: 12,
+    prework: [
+      "Lýsing á 2–3 áskorunum sem þú vilt skoða",
+      "Sýnishorn af gögnum (nafnlaus ef þarf)",
+      "Listi yfir kerfi í notkun (ERP, CRM, o.fl.)"
+    ],
+    deliverables: [
+      "AI tækifærakort sérsniðið að þinni stofnun",
+      "Hagkvæmnismat (1 bls.)",
+      "Frumgerðarhugmynd (POC útlínur)",
+      "Forgangsröðuð aðgerðaáætlun"
+    ],
+    agenda: [
+      { time: "09:00–09:45", title: "Sviðsmynda kynning", desc: "Þátttakendur kynna eigin áskoranir" },
+      { time: "09:45–10:45", title: "AI möguleikakortlagning", desc: "Gagnvirk sýnikennsla með ykkar dæmum" },
+      { time: "11:00–12:00", title: "Hraðfrumgerð", desc: "Smíðum einfaldan AI-flæðisferil saman" },
+      { time: "12:00–13:00", title: "Vegvísir", desc: "Forgangsröðun og næstu skref" }
+    ],
+    relatedPackages: ["VP01"],
+    color: "#2563eb",
+    category: "ai"
+  },
+  {
+    id: "V02",
+    slug: "ferlabyltingin",
+    title: "Ferlabyltingin",
+    tagline: "Útrýmum flöskuhálsum og bætum verkflæði í þínu kerfi",
+    description: "Endurinnleiðing á ferli með áherslu á stöður, stigmögnun og frammistöðumælingar. Notum ykkar eigin kerfi og gögn til að finna og lagfæra veikleikar.",
+    format: "Heill dagur (6 klst)",
+    price: "425.000 ISK",
+    maxAttendees: 15,
+    prework: [
+      "Yfirsýn yfir helstu ferla og stöður",
+      "Listi yfir þekktar tafir eða flöskuhálsa",
+      "Aðgangur að kerfinu fyrir sýnikennslu"
+    ],
+    deliverables: [
+      "Verkflæðisgreining (as-is og to-be)",
+      "Flöskuhálsakort og forgangsröðun",
+      "Mælaborðshönnun fyrir frammistöðu",
+      "Aðgerðaáætlun til 90 daga"
+    ],
+    agenda: [
+      { time: "09:00–10:30", title: "Kortlagning núverandi stöðu", desc: "Ferlakortlagning með ykkar gögnum" },
+      { time: "10:45–12:00", title: "Flöskuhálsaleit", desc: "Greining á töfum, handvirkum skrefum og villum" },
+      { time: "13:00–14:30", title: "Hönnunarsprettur", desc: "Tillögur að framtíðarferli" },
+      { time: "14:30–15:30", title: "Mælaborð og aðgerðaáætlun", desc: "Frammistöðuvísar og næstu skref" }
+    ],
+    relatedPackages: ["VP02", "VP03"],
+    color: "#059669",
+    category: "compliance"
+  },
+  {
+    id: "V03",
+    slug: "fra-nulli-til-raesingar",
+    title: "Frá Núlli til Ræsingar",
+    tagline: "Hönnun og smíði nýrra ferla frá grunni í þínu umhverfi",
+    description: "Innleiðing á nýju ferli eða málategund frá hugmynd til ræsingar. Hönnunarhugsun, tæknileg hönnun og breytingastjórnun.",
+    format: "2 hálfir dagar",
+    price: "425.000 ISK",
+    maxAttendees: 12,
+    prework: [
+      "Lýsing á nýju ferli eða málategund",
+      "Listi yfir hagaðila sem koma að ferlinu",
+      "Núverandi kerfi og samþættingar"
+    ],
+    deliverables: [
+      "Ferlahönnun (BPMN-rit)",
+      "Stöðuskilgreiningar og stigmögnunarreglur",
+      "Breytingastjórnunaráætlun",
+      "Innleiðingarvegvísir"
+    ],
+    agenda: [
+      { time: "Dagur 1 – 09:00–12:00", title: "Hönnunarhugsun", desc: "Hagaðilagreining, sviðsmyndir og ferlahönnun" },
+      { time: "Dagur 2 – 09:00–12:00", title: "Tæknileg hönnun", desc: "Stöður, reglur, samþættingar og breytingastjórnun" }
+    ],
+    relatedPackages: ["VP03"],
+    color: "#7c3aed",
+    category: "ux"
+  },
+  {
+    id: "V04",
+    slug: "timabestun",
+    title: "Tímabestun",
+    tagline: "Nákvæm greining og lagfæring á afgreiðslutímum mála",
+    description: "Lifandi tímagreining á málastjórnunarferlum. Finnum hvar tími tapast, setjum viðmið og stillum kerfið til að mæla og viðvara.",
+    format: "Hálfur dagur (4 klst)",
+    price: "350.000 ISK",
+    maxAttendees: 10,
+    prework: [
+      "Aðgangur að raunhæfum gögnum um afgreiðslutíma",
+      "Listi yfir núverandi SLA-kröfur ef til",
+      "Þekkt svæði þar sem tafir eru mest áberandi"
+    ],
+    deliverables: [
+      "Tímagreining á lykilferlum",
+      "SLA-tillögur og viðvörunarstillingar",
+      "Flöskuhálsakort",
+      "Stillingarleiðbeiningar"
+    ],
+    agenda: [
+      { time: "09:00–10:00", title: "Tímagreining", desc: "Lifandi greining á afgreiðslutímum í ykkar kerfi" },
+      { time: "10:00–11:00", title: "Flöskuhálsaleit", desc: "Hvar tapast tími og af hverju?" },
+      { time: "11:15–12:15", title: "SLA-hönnun", desc: "Viðmið, tilkynningar og sjálfvirkar viðvaranir" },
+      { time: "12:15–13:00", title: "Aðgerðaáætlun", desc: "Skjótar sigrar og langtímaáætlun" }
+    ],
+    relatedPackages: ["VP01", "VP02"],
+    color: "#dc2626",
+    category: "advisory"
+  },
+  {
+    id: "V05",
+    slug: "gagnasogur",
+    title: "Gagnasögur",
+    tagline: "Byggðu öflug mælaborð og komdu á sjálfþjónustu greiningarmenningu",
+    description: "Verklegt námskeið í PowerBI og skýrslugerð. Byrjum á ykkar gögnum, byggjum saman mælaborð og setjum á sjálfþjónustugetu.",
+    format: "Heill dagur (6 klst)",
+    price: "425.000 ISK",
+    maxAttendees: 12,
+    prework: [
+      "Sýnishorn af gögnum eða tengingar",
+      "Núverandi skýrslur eða mælaborð (ef til)",
+      "3 helstu spurningar sem þú vilt geta svarað úr gögnum"
+    ],
+    deliverables: [
+      "PowerBI mælaborð tengt ykkar gögnum",
+      "Sjálfþjónustuleiðbeiningar",
+      "Skýrsluhönnun og dreifileiðir",
+      "Frekari þróunaráætlun"
+    ],
+    agenda: [
+      { time: "09:00–10:30", title: "Gagnaúttekt", desc: "Hvar eru gögnin og í hvaða formi?" },
+      { time: "10:45–12:00", title: "Smíði mælaborðs", desc: "Byggjum saman með ykkar gögnum" },
+      { time: "13:00–14:30", title: "Háþróaðir eiginleikar", desc: "Þróunargreining, síur og deiling" },
+      { time: "14:30–15:30", title: "Sjálfþjónusta", desc: "Notendur búa til eigin skýrslur" }
+    ],
+    relatedPackages: ["VP01"],
+    color: "#2563eb",
+    category: "ai"
+  },
+  {
+    id: "V06",
+    slug: "snidmataverksmidjan",
+    title: "Sniðmátaverksmiðjan",
+    tagline: "Búðu til sjálfvirk skjalasniðmát með kvikum efni",
+    description: "Sköpunarlota þar sem við skoðum núverandi sniðmát, hönnun nýrra og innleiðum útgáfustýringu og sjálfvirkni.",
+    format: "Hálfur dagur (4 klst)",
+    price: "350.000 ISK",
+    maxAttendees: 10,
+    prework: [
+      "Safn af núverandi sniðmátum (Word, PDF, o.fl.)",
+      "Listi yfir sniðmát sem vantar eða þarf að uppfæra",
+      "Vörumerki og sjónrænar kröfur"
+    ],
+    deliverables: [
+      "Endurskoðuð sniðmát (2–3 lykilsniðmát)",
+      "Útgáfustýringarferli",
+      "Sjálfvirkniuppsetning",
+      "Sniðmátahönnunarleiðbeiningar"
+    ],
+    agenda: [
+      { time: "09:00–09:45", title: "Úttekt", desc: "Núverandi sniðmát: hvað virkar, hvað ekki" },
+      { time: "09:45–11:00", title: "Hönnun og hraðgerð", desc: "Saman smíðum ný sniðmát" },
+      { time: "11:15–12:00", title: "Sjálfvirkni", desc: "Kvikt efni og útgáfustýring" },
+      { time: "12:00–13:00", title: "Innleiðing", desc: "Uppsetning í kerfi og dreifileiðir" }
+    ],
+    relatedPackages: ["VP03"],
+    color: "#7c3aed",
+    category: "ux"
+  },
+  {
+    id: "V07",
+    slug: "skipulag-ur-ringulreid",
+    title: "Skipulag úr Ringulreið",
+    tagline: "Umbreyttu skjalastjórnun í skipulagt og leitarbært kerfi",
+    description: "Verklegt námskeið í skjalastjórnun og málalyklum. Greinum núverandi stöðu, hönnun nýrrar flokkunar og flutningsáætlun.",
+    format: "Hálfur dagur (4 klst)",
+    price: "350.000 ISK",
+    maxAttendees: 10,
+    prework: [
+      "Yfirsýn yfir núverandi skjalaskipan",
+      "Listi yfir helstu vandamál (t.d. tvítekningar, gamalt efni)",
+      "Hvaða kerfi geyma skjöl (netdrif, SharePoint, o.fl.)"
+    ],
+    deliverables: [
+      "Flokkunarkerfi og málalyklar",
+      "Skjalastjórnunarstefna (drög)",
+      "Flutningsáætlun frá gömlu skipan",
+      "Leiðbeiningar fyrir starfsmenn"
+    ],
+    agenda: [
+      { time: "09:00–09:45", title: "Fornleifafræði", desc: "Greining á núverandi stöðu" },
+      { time: "09:45–11:00", title: "Hönnun flokkunar", desc: "Nýr strúktúr og málalyklar" },
+      { time: "11:15–12:00", title: "Flutningsáætlun", desc: "Hvernig komum við gömlu efni yfir?" },
+      { time: "12:00–13:00", title: "Innleiðing", desc: "Verklag, leiðbeiningar og næstu skref" }
+    ],
+    relatedPackages: ["VP03", "VP02"],
+    color: "#059669",
+    category: "compliance"
+  }
+];
+
 export const card = { background:"white", border:"1px solid #e2e8f0", borderRadius:12, padding:24, transition:"all .2s" } as const;
 export const hoverCard = (e: React.MouseEvent) => { const t = e.currentTarget as HTMLElement; t.style.borderColor="#cbd5e1"; t.style.transform="translateY(-2px)"; t.style.boxShadow="0 8px 24px rgba(0,0,0,.06)"; };
 export const unhoverCard = (e: React.MouseEvent) => { const t = e.currentTarget as HTMLElement; t.style.borderColor="#e2e8f0"; t.style.transform="translateY(0)"; t.style.boxShadow="none"; };

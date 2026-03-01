@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import {
   FF, ASSESSMENT_SECTIONS, MATURITY_LEVELS, SERVICE_PACKAGES,
-  RETAINERS, BYRDING_FLOWS, CSAT_Q, card, hoverCard, unhoverCard,
+  RETAINERS, BYRDING_FLOWS, CSAT_Q, WORKSHOPS, card, hoverCard, unhoverCard,
 } from "@/lib/data";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -390,8 +390,122 @@ function SkilmalarPage() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   PAGE: Vinnustofur (Workshops)
+   ═══════════════════════════════════════════════════════════════ */
+function VinnustofurPage({ nav }: { nav: (pg: string, p?: string | null) => void }) {
+  const [workshop, setWorkshop] = useState<typeof WORKSHOPS[0] | null>(null);
+  const [filter, setFilter] = useState("all");
+  const cats = [{id:"all",l:"Allar"},{id:"ai",l:"AI & Greining"},{id:"compliance",l:"Reglufylgni"},{id:"ux",l:"UX & Samþætting"},{id:"advisory",l:"Ráðgjöf"}];
+  const list = filter === "all" ? WORKSHOPS : WORKSHOPS.filter((w: any) => w.category === filter);
+
+  if (workshop) return (
+    <div>
+      <button onClick={() => setWorkshop(null)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:14, color:"#64748b", marginBottom:24 }}>← Til baka í vinnustofur</button>
+      <div style={{ display:"flex", gap:6, marginBottom:8 }}>
+        <span style={{ fontSize:11, background:"#f1f5f9", padding:"3px 8px", borderRadius:4, color:"#64748b", fontWeight:600 }}>{workshop.id}</span>
+        <span style={{ fontSize:11, background:workshop.color+"18", padding:"3px 8px", borderRadius:4, color:workshop.color, fontWeight:600 }}>{workshop.format}</span>
+      </div>
+      <h2 style={{ fontFamily:FF, fontSize:32, color:"#0f172a", marginBottom:8 }}>{workshop.title}</h2>
+      <p style={{ color:"#64748b", fontSize:16, lineHeight:1.6, maxWidth:600, marginBottom:32 }}>{workshop.description}</p>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16, marginBottom:32 }}>
+        <div style={{ background:"#f8fafc", borderRadius:12, padding:24 }}><div style={{ fontSize:12, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:8 }}>Verð</div><div style={{ fontFamily:FF, fontSize:22, color:"#1e293b" }}>{workshop.price}</div></div>
+        <div style={{ background:"#f8fafc", borderRadius:12, padding:24 }}><div style={{ fontSize:12, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:8 }}>Snið</div><div style={{ fontFamily:FF, fontSize:22, color:"#1e293b" }}>{workshop.format}</div></div>
+        <div style={{ background:"#f8fafc", borderRadius:12, padding:24 }}><div style={{ fontSize:12, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:8 }}>Hámark</div><div style={{ fontFamily:FF, fontSize:22, color:"#1e293b" }}>{workshop.maxAttendees} þátttak.</div></div>
+      </div>
+
+      {/* Agenda */}
+      <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:16 }}>Dagskrá</h3>
+      <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:32 }}>
+        {workshop.agenda.map((a: any, i: number) => (
+          <div key={i} style={{ ...card, display:"flex", gap:16, alignItems:"flex-start" }}>
+            <div style={{ fontSize:12, fontWeight:600, color:workshop.color, whiteSpace:"nowrap", minWidth:120 }}>{a.time}</div>
+            <div><strong style={{ fontSize:14 }}>{a.title}</strong><p style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{a.desc}</p></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Pre-work */}
+      <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:16 }}>Undirbúningur þátttakenda</h3>
+      <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:32 }}>
+        {workshop.prework.map((p: any, i: number) => (
+          <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
+            <div style={{ width:20, height:20, borderRadius:6, background:workshop.color+"18", color:workshop.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, flexShrink:0, marginTop:2 }}>{i+1}</div>
+            <span style={{ fontSize:14, color:"#334155", lineHeight:1.5 }}>{p}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Deliverables */}
+      <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:16 }}>Afrakstur</h3>
+      <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:32 }}>
+        {workshop.deliverables.map((d: any, i: number) => (
+          <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
+            <span style={{ color:workshop.color, fontWeight:700, flexShrink:0 }}>✓</span>
+            <span style={{ fontSize:14, color:"#334155", lineHeight:1.5 }}>{d}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Cross-sell to related packages */}
+      {workshop.relatedPackages.length > 0 && (
+        <div style={{ ...card, background:"#f8fafc", marginBottom:32 }}>
+          <h4 style={{ fontFamily:FF, fontSize:16, marginBottom:12 }}>Viltu fara lengra?</h4>
+          <p style={{ fontSize:14, color:"#64748b", lineHeight:1.6, marginBottom:16 }}>Þessi vinnustofa er fyrsta skrefið. Ef niðurstöðurnar kalla á djúpri vinnu, þá tengist hún beint í:</p>
+          <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+            {workshop.relatedPackages.map((pid: any) => {
+              const pkg = SERVICE_PACKAGES.find((p: any) => p.id === pid);
+              if (!pkg) return null;
+              return (
+                <button key={pid} onClick={() => nav("thjonusta", pkg.slug)} style={{ padding:"8px 16px", background:"white", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:500 }}>
+                  {pkg.id} · {pkg.title} →
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* CTA */}
+      <div style={{ background:"#1e293b", borderRadius:12, padding:"40px 32px", textAlign:"center", color:"white" }}>
+        <h3 style={{ fontFamily:FF, fontSize:20, color:"#c8a96e", marginBottom:8 }}>Skráðu þig á vinnustofu</h3>
+        <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, maxWidth:480, margin:"0 auto 24px" }}>Hafðu samband og við finnum dagsetningu sem hentar. Vinnustofan er haldin hjá ykkur, með ykkar gögnum.</p>
+        <a href={`mailto:bjarni@moholt.is?subject=${encodeURIComponent(workshop.title)}%20-%20Skráning`} style={{ display:"inline-block", background:"#c8a96e", color:"#1e293b", fontFamily:FF, fontSize:15, fontWeight:700, padding:"14px 36px", borderRadius:4, textDecoration:"none" }}>Hafa samband</a>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ marginBottom:32 }}>
+        <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"#64748b", marginBottom:4 }}>Vinnustofur</div>
+        <h2 style={{ fontFamily:FF, fontSize:32, color:"#0f172a", marginBottom:8 }}>Vinnustofur og námskeið</h2>
+        <p style={{ color:"#64748b", maxWidth:520, lineHeight:1.6 }}>Verklegar vinnustofur hjá ykkur, með ykkar gögnum og kerfum. Hvert námskeið er fyrsta skrefið í átt að innleiðingu.</p>
+      </div>
+      <div style={{ display:"flex", gap:8, marginBottom:24, flexWrap:"wrap" }}>
+        {cats.map((c: any) => (
+          <button key={c.id} onClick={() => setFilter(c.id)} style={{ padding:"6px 16px", borderRadius:20, border:"1px solid", fontSize:13, fontWeight:500, cursor:"pointer", borderColor:filter===c.id?"#2563eb":"#e2e8f0", background:filter===c.id?"#eff6ff":"white", color:filter===c.id?"#2563eb":"#64748b" }}>{c.l}</button>
+        ))}
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16 }}>
+        {list.map((w: any) => (
+          <div key={w.id} onClick={() => setWorkshop(w)} style={{ ...card, cursor:"pointer" }} onMouseEnter={hoverCard} onMouseLeave={unhoverCard}>
+            <div style={{ fontSize:11, color:"#94a3b8", fontWeight:600, marginBottom:12 }}>{w.id}</div>
+            <h3 style={{ fontFamily:FF, fontSize:18, color:"#1e293b", marginBottom:6 }}>{w.title}</h3>
+            <p style={{ fontSize:13, color:"#64748b", lineHeight:1.5, marginBottom:16 }}>{w.tagline}</p>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <span style={{ fontSize:13, fontWeight:600, color:w.color }}>{w.price}</span>
+              <span style={{ fontSize:12, color:"#94a3b8" }}>{w.format}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    REMAINING PAGES: Forsíða, Þjónusta, Samningar, Byrðing
-   (same as before but with Heilsufarsmat button on home)
    ═══════════════════════════════════════════════════════════════ */
 
 function HomePage({ nav }: { nav: (page: string, param?: string | null) => void }) {
@@ -430,10 +544,10 @@ function HomePage({ nav }: { nav: (page: string, param?: string | null) => void 
           <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:8 }}>Málastjórnun sjálfsmat</h3>
           <p style={{ fontSize:12, opacity:.7, lineHeight:1.5 }}>20 spurningar · 5 þroskaþrep · Ókeypis</p>
         </div>
-        <div onClick={()=>nav("byrding")} style={{ background:"linear-gradient(135deg,#1e293b,#334155)", borderRadius:12, padding:28, color:"white", cursor:"pointer", transition:"transform .2s" }} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
-          <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, opacity:.6, marginBottom:8 }}>Byrðing</div>
-          <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:8 }}>Undirbúningur verkefna</h3>
-          <p style={{ fontSize:12, opacity:.7, lineHeight:1.5 }}>Gátlistar sem tryggja réttan grunn</p>
+        <div onClick={()=>nav("vinnustofur")} style={{ background:"linear-gradient(135deg,#1e293b,#334155)", borderRadius:12, padding:28, color:"white", cursor:"pointer", transition:"transform .2s" }} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
+          <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, opacity:.6, marginBottom:8 }}>Vinnustofur</div>
+          <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:8 }}>Verklegar vinnustofur</h3>
+          <p style={{ fontSize:12, opacity:.7, lineHeight:1.5 }}>7 vinnustofur · Hjá ykkur · Með ykkar gögnum</p>
         </div>
         <div onClick={()=>nav("retainer")} style={{ background:"linear-gradient(135deg,#1e3a5f,#1e293b)", borderRadius:12, padding:28, color:"white", cursor:"pointer", transition:"transform .2s" }} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
           <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, opacity:.6, marginBottom:8 }}>Samningar</div>
@@ -471,9 +585,21 @@ function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | nul
       <div style={{ display:"flex", gap:0, marginBottom:32 }}>{pkg.phases.map((ph: any, i: number)=>(<div key={i} style={{ flex:1 }}><div style={{ height:4, background:i===0?pkg.color:"#e2e8f0", borderRadius:i===0?"2px 0 0 2px":i===pkg.phases.length-1?"0 2px 2px 0":0 }} /><div style={{ fontSize:12, fontWeight:500, color:"#64748b", marginTop:8, paddingRight:8 }}>{ph}</div></div>))}</div>
       <div style={{ display:"flex", gap:12, marginBottom:32 }}>
         {BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id))&&<button onClick={()=>{const f=BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id));if(f)nav("byrding",f.slug);}} style={{ padding:"12px 24px", background:pkg.color, color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>Hefja byrðingu →</button>}
-        <button onClick={()=>setCsat(!csat)} style={{ padding:"12px 24px", background:"white", color:"#64748b", border:"1px solid #d1d5db", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>{csat?"Fela endurgjöf":"Gefa endurgjöf"}</button>
       </div>
-      {csat&&<CSATWidget context="service" contextId={pkg.id} contextTitle={pkg.title} onClose={()=>setCsat(false)} />}
+      {/* Cross-sell: related workshop */}
+      {WORKSHOPS.filter((w: any) => w.relatedPackages.includes(pkg.id)).length > 0 && (
+        <div style={{ ...card, background:"#f8fafc", marginBottom:32 }}>
+          <h4 style={{ fontFamily:FF, fontSize:16, marginBottom:12 }}>Byrjaðu með vinnustofu</h4>
+          <p style={{ fontSize:14, color:"#64748b", lineHeight:1.6, marginBottom:16 }}>Ekki viss um fullan pakka? Prófaðu vinnustofu fyrst – verklegt námskeið sem sýnir gildi þessarar þjónustu.</p>
+          <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+            {WORKSHOPS.filter((w: any) => w.relatedPackages.includes(pkg.id)).map((w: any) => (
+              <button key={w.id} onClick={() => nav("vinnustofur")} style={{ padding:"8px 16px", background:"white", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:500 }}>
+                {w.id} · {w.title} · {w.price} →
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -552,7 +678,7 @@ export default function MoholtApp() {
     window.addEventListener("popstate",onPop);
     return ()=>window.removeEventListener("popstate",onPop);
   },[]);
-  const items=[{id:"home",l:"Forsíða"},{id:"thjonusta",l:"Þjónusta"},{id:"heilsufarsmat",l:"Heilsufarsmat"},{id:"byrding",l:"Byrðing"},{id:"retainer",l:"Samningar"},{id:"um",l:"Um okkur"}];
+  const items=[{id:"home",l:"Forsíða"},{id:"thjonusta",l:"Þjónusta"},{id:"vinnustofur",l:"Vinnustofur"},{id:"retainer",l:"Samningar"},{id:"heilsufarsmat",l:"Heilsufarsmat"},{id:"um",l:"Um okkur"}];
 
   return (
     <div style={{ fontFamily:"'Söhne','Satoshi',-apple-system,BlinkMacSystemFont,sans-serif", background:"#fafafa", minHeight:"100vh", color:"#1e293b" }}>
@@ -560,7 +686,7 @@ export default function MoholtApp() {
       <header style={{ background:"white", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
         <div style={{ maxWidth:960, margin:"0 auto", padding:"0 24px", display:"flex", justifyContent:"space-between", alignItems:"center", height:56 }}>
           <div onClick={()=>nav("home")} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:28, height:28, borderRadius:6, background:"#1e293b", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:14 }}>M</div>
+            <img src="/logo.png" alt="Móholt" style={{ height:28 }} />
             <span style={{ fontFamily:FF, fontSize:18, color:"#0f172a" }}>Móholt</span>
           </div>
           {/* Desktop nav */}
@@ -573,6 +699,7 @@ export default function MoholtApp() {
       <main style={{ maxWidth:960, margin:"0 auto", padding:"32px 24px 64px" }}>
         {route==="home"&&<HomePage nav={nav} />}
         {route==="thjonusta"&&<ThjonustuPage nav={nav} slug={param} />}
+        {route==="vinnustofur"&&<VinnustofurPage nav={nav} />}
         {route==="heilsufarsmat"&&<HeilsufarsmatPage />}
         {route==="byrding"&&<ByrdingPage nav={nav} slug={param} />}
         {route==="retainer"&&<RetainerPage />}
