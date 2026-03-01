@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendNotification, emailTemplate } from "@/lib/send";
+import { appendRow } from "@/lib/sheets";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,6 +34,19 @@ export async function POST(req: NextRequest) {
       html,
       replyTo: email,
     });
+
+    // Append to Google Sheets (fire-and-forget, optional)
+    appendRow("Pantanir", [
+      new Date().toISOString(),
+      type,
+      `${packageId} ${packageTitle}`,
+      name,
+      email,
+      company || "",
+      attendees || "",
+      datePreference || "",
+      message || "",
+    ]).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch {

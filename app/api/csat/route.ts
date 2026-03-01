@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendNotification, emailTemplate } from "@/lib/send";
+import { appendRow } from "@/lib/sheets";
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,6 +33,16 @@ export async function POST(req: NextRequest) {
       subject: `CSAT: ${contextId || context} — ${avg}/5`,
       html,
     });
+
+    // Append to Google Sheets (fire-and-forget, optional)
+    appendRow("CSAT", [
+      new Date().toISOString(),
+      context,
+      `${contextId} ${contextTitle}`,
+      avg,
+      JSON.stringify(answers),
+      answers.comment || "",
+    ]).catch(() => {});
 
     return NextResponse.json({ success: true, message: "Takk fyrir endurgjöfina" });
   } catch {

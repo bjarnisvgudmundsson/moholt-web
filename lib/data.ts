@@ -499,6 +499,41 @@ export const WORKSHOPS = [
   }
 ];
 
+// ═══════════════════════════════════════════════════════════════
+// CROSS-SELL MATRIX — GTM Campaign
+// ═══════════════════════════════════════════════════════════════
+
+export const CROSS_SELL_MATRIX: Array<{
+  from: string;
+  to: string;
+  strength: 1 | 2 | 3;
+  trigger: string;
+  timing: string;
+}> = [
+  // Workshop → Service Package
+  { from: "V01", to: "VP01", strength: 3, trigger: "Ef frumgerð sýndi möguleika", timing: "at_delivery" },
+  { from: "V02", to: "VP02", strength: 3, trigger: "Ef ferlagreining leiddi í ljós veikleika", timing: "at_delivery" },
+  { from: "V02", to: "VP03", strength: 2, trigger: "Ef UX vandamál komu í ljós", timing: "30_days" },
+  { from: "V03", to: "VP03", strength: 3, trigger: "Ef nýtt ferli þarf fulla innleiðingu", timing: "at_delivery" },
+  { from: "V04", to: "VP01", strength: 2, trigger: "Ef tímamælingar kalla á sjálfvirkni", timing: "at_delivery" },
+  { from: "V04", to: "VP02", strength: 2, trigger: "Ef SLA vantar í ferla", timing: "at_delivery" },
+  { from: "V05", to: "VP01", strength: 2, trigger: "Ef gagnagæði þarf AI-stuðning", timing: "30_days" },
+  { from: "V06", to: "VP03", strength: 2, trigger: "Ef sniðmát þurfa kerfisvæðingu", timing: "at_delivery" },
+  { from: "V07", to: "VP02", strength: 2, trigger: "Ef skjalastjórnun tengist reglufylgni", timing: "at_delivery" },
+  // Service Package → Retainer
+  { from: "VP01", to: "R01", strength: 3, trigger: "Eftir innleiðingu — stöðugur stuðningur", timing: "at_delivery" },
+  { from: "VP02", to: "R01", strength: 3, trigger: "Eftir reglufylgni — viðhaldssamningur", timing: "at_delivery" },
+  { from: "VP03", to: "R02", strength: 2, trigger: "Eftir UX innleiðingu — áframhaldandi þjónusta", timing: "at_delivery" },
+  { from: "VP04", to: "R01", strength: 2, trigger: "Eftir ráðgjöf — eftirfylgni", timing: "30_days" },
+  // Heilsufarsmat → Workshop
+  { from: "HEILSUFARSMAT", to: "V04", strength: 3, trigger: "Ef lág stig í tíma/ferli", timing: "at_delivery" },
+  { from: "HEILSUFARSMAT", to: "V02", strength: 3, trigger: "Ef veikleikar í reglufylgni", timing: "at_delivery" },
+  { from: "HEILSUFARSMAT", to: "V01", strength: 2, trigger: "Ef lág tæknistig", timing: "at_delivery" },
+  // M-packages
+  { from: "M02", to: "V02", strength: 3, trigger: "Eftir heilsuskoðun — dýpri greining", timing: "at_delivery" },
+  { from: "M01", to: "VP02", strength: 3, trigger: "Eftir ISO gap — full innleiðing", timing: "at_delivery" },
+];
+
 export const card = { background:"white", border:"1px solid #e2e8f0", borderRadius:12, padding:24, transition:"all .2s" } as const;
 export const hoverCard = (e: React.MouseEvent) => { const t = e.currentTarget as HTMLElement; t.style.borderColor="#cbd5e1"; t.style.transform="translateY(-2px)"; t.style.boxShadow="0 8px 24px rgba(0,0,0,.06)"; };
 export const unhoverCard = (e: React.MouseEvent) => { const t = e.currentTarget as HTMLElement; t.style.borderColor="#e2e8f0"; t.style.transform="translateY(0)"; t.style.boxShadow="none"; };
