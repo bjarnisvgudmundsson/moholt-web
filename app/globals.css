@@ -13,3 +13,42 @@ body {
 }
 
 a { color: inherit; }
+
+@media print {
+  /* Hide non-print elements */
+  .no-print,
+  nav,
+  footer,
+  [data-cookie-banner] {
+    display: none !important;
+  }
+
+  /* Clean print layout */
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ensure cards have borders when printed */
+  * {
+    box-shadow: none !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  /* Avoid breaking inside cards */
+  div[style*="border-radius"] {
+    break-inside: avoid;
+  }
+
+  /* Force background colors to print */
+  div[style*="background"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

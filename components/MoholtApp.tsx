@@ -14,7 +14,7 @@ function CookieBanner() {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div style={{ position:"fixed", bottom:0, left:0, right:0, background:"#1e293b", color:"white", padding:"16px 24px", display:"flex", alignItems:"center", justifyContent:"center", gap:16, zIndex:200, flexWrap:"wrap", fontSize:13 }}>
+    <div className="no-print" style={{ position:"fixed", bottom:0, left:0, right:0, background:"#1e293b", color:"white", padding:"16px 24px", display:"flex", alignItems:"center", justifyContent:"center", gap:16, zIndex:200, flexWrap:"wrap", fontSize:13 }}>
       <span>Þessi vefsíða notar aðeins nauðsynlegar vafrakökur. Engin greiningarkökur eru notaðar án samþykkis.</span>
       <button onClick={()=>setVisible(false)} style={{ padding:"8px 20px", background:"#2563eb", color:"white", border:"none", borderRadius:6, fontWeight:600, cursor:"pointer", fontSize:13 }}>Samþykkja</button>
       <button onClick={()=>setVisible(false)} style={{ padding:"8px 20px", background:"transparent", color:"#94a3b8", border:"1px solid #475569", borderRadius:6, fontWeight:500, cursor:"pointer", fontSize:13 }}>Hafna</button>
@@ -137,6 +137,8 @@ function HeilsufarsmatPage() {
   const [answers,setAnswers]=useState<Record<number, number>>({});
   const [results,setResults]=useState<any>(null);
   const [notes,setNotes]=useState<Record<number, string>>({});
+  const [org, setOrg] = useState("");
+  const [respondentEmail, setRespondentEmail] = useState("");
   const totalQ=20;
   const answered=Object.keys(answers).length;
 
@@ -167,13 +169,13 @@ function HeilsufarsmatPage() {
     if(dims.D.pct<50) insights.push({icon:"ℹ",cls:"info",t:"Tæknigrunngurinn þarf uppfærslu",b:"Kerfið er of fast og erfiðlega aðlaganlegt."});
     else insights.push({icon:"✓",cls:"ok",t:"Sterk tæknigeta",b:"Kerfið er nútímalegt. Næsta skref: nýta grunninn með AI."});
 
-    setResults({total,level,dims,recs,insights,levelIdx:MATURITY_LEVELS.indexOf(level),notes});
+    setResults({total,level,dims,recs,insights,levelIdx:MATURITY_LEVELS.indexOf(level),notes,org,respondentEmail});
 
     // Send to API
     fetch("/api/heilsufarsmat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers, notes, total, level: level.label, dims, ts: new Date().toISOString() }),
+      body: JSON.stringify({ answers, notes, total, level: level.label, dims, org, respondentEmail, ts: new Date().toISOString() }),
     }).catch(() => {}); // fire and forget — don't block results display
 
     setPhase("results");
@@ -193,76 +195,157 @@ function HeilsufarsmatPage() {
           </div>
         ))}
       </div>
+      <div style={{ display:"flex", gap:12, maxWidth:480, margin:"0 auto 24px", flexWrap:"wrap" }}>
+        <input
+          value={org}
+          onChange={e => setOrg(e.target.value)}
+          placeholder="Stofnun / fyrirtæki (valfrjálst)"
+          style={{ flex:1, minWidth:200, padding:"10px 14px", border:"1px solid #e2e8f0", borderRadius:8, fontSize:14, fontFamily:"inherit", color:"#1e293b" }}
+        />
+        <input
+          value={respondentEmail}
+          onChange={e => setRespondentEmail(e.target.value)}
+          type="email"
+          placeholder="Netfang þátttakanda (valfrjálst)"
+          style={{ flex:1, minWidth:200, padding:"10px 14px", border:"1px solid #e2e8f0", borderRadius:8, fontSize:14, fontFamily:"inherit", color:"#1e293b" }}
+        />
+      </div>
+      <p style={{ fontSize:11, color:"#94a3b8", maxWidth:480, margin:"0 auto 24px", textAlign:"center" }}>
+        Upplýsingarnar eru eingöngu notaðar til að senda þér niðurstöður. Við deilum þeim ekki með þriðja aðila.
+      </p>
       <button onClick={()=>setPhase("quiz")} style={{ padding:"16px 40px", background:"#1e293b", color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:16, cursor:"pointer" }}>Hefja mat →</button>
     </div>
   );
 
   // RESULTS
   if(phase==="results"&&results) {
-    const R=results;
+    const { total, level, dims, insights, recs, notes: savedNotes, org: savedOrg, respondentEmail: savedEmail } = results;
+    const pct = Math.round((total / 80) * 100);
+    const dimsArray = Object.entries(dims).map(([key, d]: [string, any]) => ({
+      key,
+      name: d.name,
+      score: d.score,
+      max: d.max,
+      pct: d.pct,
+      label: d.pct<40?"Veikt":d.pct<60?"Miðlungs":d.pct<80?"Gott":"Sterkt",
+    }));
+
     return (
       <div>
-        <div style={{ background:"#1e293b", borderRadius:12, padding:"48px 32px", textAlign:"center", color:"white", marginBottom:32 }}>
-          <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"rgba(255,255,255,.5)", marginBottom:16 }}>Heilsufarsmat Málastjórnunar · Móholt ehf.</div>
-          <div style={{ fontFamily:FF, fontSize:64, fontWeight:700, lineHeight:1 }}>{R.total}<span style={{ fontSize:24, color:"rgba(255,255,255,.4)" }}>/80</span></div>
-          <div style={{ fontFamily:FF, fontSize:24, color:"rgba(255,255,255,.7)", margin:"8px 0" }}>Þrep: {R.level.label}</div>
-          <p style={{ color:"rgba(255,255,255,.6)", maxWidth:500, margin:"0 auto", fontSize:14 }}>{R.level.desc}</p>
-          {/* Gauge */}
-          <div style={{ display:"flex", maxWidth:400, margin:"24px auto 0", gap:2 }}>
-            {MATURITY_LEVELS.map((_: any, i: number)=>(
-              <div key={i} style={{ flex:1, height:6, borderRadius:3, background:i<R.levelIdx?"rgba(255,255,255,.6)":i===R.levelIdx?"rgba(255,255,255,.3)":"rgba(255,255,255,.1)" }} />
-            ))}
-          </div>
-          <div style={{ display:"flex", justifyContent:"space-between", maxWidth:400, margin:"6px auto 0" }}>
-            {MATURITY_LEVELS.map((l: any, i: number)=><span key={i} style={{ fontSize:9, color:"rgba(255,255,255,.35)", textTransform:"uppercase" }}>{l.label}</span>)}
+        {/* Light header — matches other pages */}
+        <div style={{ marginBottom:32 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:16 }}>
+            <div>
+              <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"#64748b", marginBottom:4 }}>Heilsufarsmat málastjórnunar</div>
+              <h2 style={{ fontFamily:FF, fontSize:32, color:"#0f172a", marginBottom:4 }}>Niðurstöður</h2>
+              {savedOrg && <p style={{ fontSize:14, color:"#64748b" }}>{savedOrg}</p>}
+              <p style={{ fontSize:12, color:"#94a3b8" }}>{new Date().toLocaleDateString("is-IS", { day:"numeric", month:"long", year:"numeric" })}</p>
+            </div>
+            <button
+              onClick={() => window.print()}
+              className="no-print"
+              style={{ padding:"10px 20px", background:"white", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:500, color:"#475569", display:"flex", alignItems:"center", gap:6 }}
+            >
+              🖨 Prenta niðurstöður
+            </button>
           </div>
         </div>
-        {/* Dimension cards */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:32 }}>
-          {Object.entries(R.dims).map(([k,d]: [string, any])=>(
-            <div key={k} style={{ ...card }}>
-              <div style={{ fontSize:12, fontWeight:600, color:"#64748b", marginBottom:8 }}>{k} · {d.name}</div>
+
+        {/* Score summary — light card, not dark block */}
+        <div style={{ background:"#f8fafc", borderRadius:12, padding:"28px 32px", marginBottom:24, display:"flex", alignItems:"center", gap:32, flexWrap:"wrap" }}>
+          <div style={{ textAlign:"center", minWidth:100 }}>
+            <div style={{ fontFamily:FF, fontSize:48, color:"#0f172a", lineHeight:1 }}>{total}<span style={{ fontSize:20, color:"#94a3b8" }}>/80</span></div>
+            <div style={{ fontSize:12, color:"#94a3b8", marginTop:4 }}>{pct}%</div>
+          </div>
+          <div style={{ flex:1, minWidth:200 }}>
+            <div style={{ fontFamily:FF, fontSize:20, color:"#0f172a", marginBottom:4 }}>Þrep: {level.label}</div>
+            <p style={{ fontSize:14, color:"#64748b", lineHeight:1.5, marginBottom:12 }}>{level.desc}</p>
+            {/* Simple thin gauge */}
+            <div style={{ display:"flex", gap:3 }}>
+              {MATURITY_LEVELS.map((ml: any, i: number) => (
+                <div key={i} style={{ flex:1, height:4, borderRadius:2, background: i <= MATURITY_LEVELS.indexOf(level) ? "#1e293b" : "#e2e8f0" }} />
+              ))}
+            </div>
+            <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
+              {MATURITY_LEVELS.map((ml: any, i: number) => (
+                <span key={i} style={{ fontSize:9, color: i === MATURITY_LEVELS.indexOf(level) ? "#1e293b" : "#cbd5e1", textTransform:"uppercase", letterSpacing:.5, fontWeight: i === MATURITY_LEVELS.indexOf(level) ? 700 : 400 }}>{ml.label}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Dimension cards — compact 2x2 grid */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:32 }}>
+          {dimsArray.map((d: any) => (
+            <div key={d.key} style={{ background:"white", border:"1px solid #e2e8f0", borderRadius:10, padding:"16px 20px" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                <span style={{ fontFamily:FF, fontSize:24 }}>{d.score}<span style={{ fontSize:14, color:"#94a3b8" }}>/{d.max}</span></span>
-                <span style={{ fontSize:11, padding:"3px 8px", borderRadius:4, fontWeight:600, background:"#f1f5f9", color:"#475569" }}>
-                  {d.pct<40?"Veikt":d.pct<60?"Miðlungs":d.pct<80?"Gott":"Sterkt"}
-                </span>
+                <span style={{ fontSize:13, fontWeight:500, color:"#334155" }}>{d.key} · {d.name}</span>
+                <span style={{ fontSize:12, color:"#64748b", background:"#f1f5f9", padding:"2px 8px", borderRadius:4 }}>{d.label}</span>
               </div>
-              <div style={{ height:6, background:"#e2e8f0", borderRadius:3, overflow:"hidden" }}>
-                <div style={{ height:"100%", width:`${d.pct}%`, background:"#1e293b", borderRadius:3, transition:"width .5s" }} />
+              <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:6 }}>
+                <span style={{ fontFamily:FF, fontSize:24, color:"#0f172a" }}>{d.score}</span>
+                <span style={{ fontSize:13, color:"#94a3b8" }}>/20</span>
+              </div>
+              <div style={{ height:3, background:"#f1f5f9", borderRadius:2 }}>
+                <div style={{ height:"100%", width:`${d.pct}%`, background:"#1e293b", borderRadius:2 }} />
               </div>
             </div>
           ))}
         </div>
-        {/* Insights */}
-        <h3 style={{ fontFamily:FF, fontSize:20, marginBottom:16 }}>Helstu niðurstöður</h3>
-        <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
-          {R.insights.map((ins: any, i: number)=>(
-            <div key={i} style={{ ...card, display:"flex", gap:16, alignItems:"flex-start" }}>
-              <div style={{ width:36, height:36, borderRadius:8, background:"#f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{ins.icon}</div>
-              <div><strong style={{ fontSize:14 }}>{ins.t}</strong><p style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{ins.b}</p></div>
+
+        {/* Key insights — simple rows */}
+        <h3 style={{ fontFamily:FF, fontSize:18, color:"#0f172a", marginBottom:12 }}>Helstu niðurstöður</h3>
+        <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:32 }}>
+          {insights.map((ins: any, i: number) => (
+            <div key={i} style={{ background:"white", border:"1px solid #e2e8f0", borderRadius:8, padding:"12px 16px", display:"flex", gap:12, alignItems:"flex-start" }}>
+              <span style={{ fontSize:14, flexShrink:0, marginTop:1 }}>{ins.cls === "warn" ? "⚠" : ins.cls === "ok" ? "✓" : "→"}</span>
+              <div>
+                <strong style={{ fontSize:14, color:"#1e293b" }}>{ins.t}</strong>
+                <p style={{ fontSize:13, color:"#64748b", marginTop:2, lineHeight:1.4 }}>{ins.b}</p>
+              </div>
             </div>
           ))}
         </div>
-        {/* Recs */}
-        <h3 style={{ fontFamily:FF, fontSize:20, marginBottom:16 }}>Forgangsráðleggingar frá Móholt</h3>
-        <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
-          {R.recs.map((r: any, i: number)=>(
-            <div key={i} style={{ ...card, display:"flex", gap:16, alignItems:"flex-start" }}>
-              <div style={{ fontFamily:FF, fontSize:24, color:"#94a3b8", fontWeight:700, flexShrink:0, width:32 }}>0{i+1}</div>
-              <div><strong style={{ fontSize:14 }}>{r.t}</strong><p style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{r.b}</p></div>
+
+        {/* Recommendations — numbered action items */}
+        <h3 style={{ fontFamily:FF, fontSize:18, color:"#0f172a", marginBottom:12 }}>Forgangsráðleggingar</h3>
+        <p style={{ fontSize:13, color:"#64748b", marginBottom:16, lineHeight:1.5 }}>Þessar ráðleggingar eru byggðar á niðurstöðum matsins og miða að því að styrkja þau svið sem mest þurfa á bætingu að halda.</p>
+        <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:32 }}>
+          {recs.map((r: any, i: number) => (
+            <div key={i} style={{ background:"white", border:"1px solid #e2e8f0", borderRadius:10, padding:"16px 20px", display:"flex", gap:16, alignItems:"flex-start" }}>
+              <div style={{ width:28, height:28, borderRadius:8, background:"#f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:700, color:"#475569", flexShrink:0 }}>{i + 1}</div>
+              <div>
+                <strong style={{ fontSize:14, color:"#1e293b", display:"block", marginBottom:2 }}>{r.t}</strong>
+                <p style={{ fontSize:13, color:"#64748b", lineHeight:1.5 }}>{r.b}</p>
+              </div>
             </div>
           ))}
         </div>
-        {/* CTA */}
-        <div style={{ background:"#1e293b", borderRadius:12, padding:"40px 32px", textAlign:"center", color:"white" }}>
-          <h3 style={{ fontFamily:FF, fontSize:20, color:"white", marginBottom:8 }}>Langar þig að ræða þetta nánar?</h3>
-          <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, maxWidth:480, margin:"0 auto 24px" }}>Við bjóðum upp á stuttan, 30 mínútna, endurgjafafund þar sem við förum yfir niðurstöðurnar – án skuldbindingar.</p>
-          {R.notes&&Object.values(R.notes).filter(Boolean).length>0&&(
-            <p style={{ color:"rgba(255,255,255,.4)", fontSize:12, marginBottom:16 }}>Þú bættir við athugasemdum við {Object.values(R.notes).filter(Boolean).length} spurningar – þær verða hluti af endurgjöfinni.</p>
-          )}
-          <a href="mailto:bjarni@moholt.is?subject=Heilsufarsmat%20-%20Endurgjafafundur" style={{ display:"inline-block", background:"white", color:"#1e293b", fontFamily:FF, fontSize:15, fontWeight:700, padding:"14px 36px", borderRadius:4, textDecoration:"none" }}>Bóka endurgjafafund</a>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:12 }}>Engin skuldbinding. Við seljum ekki gögn þín til þriðja aðila.</div>
+
+        {/* Notes summary — only if user wrote notes */}
+        {savedNotes && Object.values(savedNotes).some((v: any) => v) && (
+          <>
+            <h3 style={{ fontFamily:FF, fontSize:18, color:"#0f172a", marginBottom:12 }}>Athugasemdir þátttakanda</h3>
+            <div style={{ background:"#f8fafc", borderRadius:10, padding:"16px 20px", marginBottom:32 }}>
+              {Object.entries(savedNotes).filter(([, v]) => v).map(([qId, text]) => (
+                <div key={qId} style={{ marginBottom:8, fontSize:13, color:"#475569", lineHeight:1.5 }}>
+                  <span style={{ color:"#94a3b8", fontSize:12 }}>Sp. {qId}: </span>{String(text)}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* CTA — light, not dark */}
+        <div className="no-print" style={{ background:"#f8fafc", borderRadius:12, padding:"28px 32px", textAlign:"center", marginBottom:32 }}>
+          <h3 style={{ fontFamily:FF, fontSize:18, color:"#0f172a", marginBottom:6 }}>Langar þig að ræða þetta nánar?</h3>
+          <p style={{ color:"#64748b", fontSize:14, maxWidth:480, margin:"0 auto 20px", lineHeight:1.5 }}>Við bjóðum upp á stuttan, 30 mínútna, endurgjafafund þar sem við förum yfir niðurstöðurnar — án skuldbindingar.</p>
+          <a href={`mailto:bjarni@moholt.is?subject=Endurgjafafundur%20-%20Heilsufarsmat${savedOrg ? "%20-%20" + encodeURIComponent(savedOrg) : ""}`} style={{ display:"inline-block", padding:"12px 28px", background:"#1e293b", color:"white", borderRadius:8, fontWeight:600, fontSize:14, textDecoration:"none" }}>Bóka endurgjafafund</a>
+        </div>
+
+        {/* Restart */}
+        <div className="no-print" style={{ textAlign:"center" }}>
+          <button onClick={() => { setPhase("intro"); setAnswers({}); setNotes({}); setOrg(""); setRespondentEmail(""); }} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:13, cursor:"pointer" }}>Taka matið aftur →</button>
         </div>
       </div>
     );
@@ -773,7 +856,7 @@ export default function MoholtApp() {
   return (
     <div style={{ fontFamily:"'Söhne','Satoshi',-apple-system,BlinkMacSystemFont,sans-serif", background:"#fafafa", minHeight:"100vh", color:"#1e293b" }}>
 
-      <header style={{ background:"white", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
+      <header className="no-print" style={{ background:"white", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
         <div style={{ maxWidth:960, margin:"0 auto", padding:"0 24px", display:"flex", justifyContent:"space-between", alignItems:"center", height:56 }}>
           <div onClick={()=>nav("home")} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:10 }}>
             <img src="/logo.png" alt="Móholt" style={{ height:28 }} />
@@ -798,7 +881,7 @@ export default function MoholtApp() {
         {route==="skilmalar"&&<SkilmalarPage />}
       </main>
 
-      <footer style={{ borderTop:"1px solid #e2e8f0", padding:"32px 24px", background:"white" }}>
+      <footer className="no-print" style={{ borderTop:"1px solid #e2e8f0", padding:"32px 24px", background:"white" }}>
         <div style={{ maxWidth:960, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:16 }}>
           <div>
             <div style={{ fontFamily:FF, fontSize:16, marginBottom:4 }}>Móholt ehf.</div>

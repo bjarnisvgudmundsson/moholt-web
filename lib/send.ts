@@ -7,9 +7,10 @@ interface SendOpts {
   subject: string;
   html: string;
   replyTo?: string;
+  to?: string;
 }
 
-export async function sendNotification({ subject, html, replyTo }: SendOpts) {
+export async function sendNotification({ subject, html, replyTo, to }: SendOpts) {
   // Check if API key is configured
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY not configured - email not sent");
@@ -20,7 +21,7 @@ export async function sendNotification({ subject, html, replyTo }: SendOpts) {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from: FROM,
-      to: TO,
+      to: to || TO,
       subject,
       html,
       ...(replyTo ? { replyTo } : {}),
