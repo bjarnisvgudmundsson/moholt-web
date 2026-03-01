@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   FF, ASSESSMENT_SECTIONS, MATURITY_LEVELS, SERVICE_PACKAGES,
   RETAINERS, BYRDING_FLOWS, CSAT_Q, card, hoverCard, unhoverCard,
@@ -541,7 +541,17 @@ export default function MoholtApp() {
   const [route,setRoute]=useState("home");
   const [param,setParam]=useState<string | null>(null);
   const [menuOpen,setMenuOpen]=useState(false);
-  const nav=useCallback((pg: string, p: string | null = null)=>{setRoute(pg);setParam(p);setMenuOpen(false);window.scrollTo(0,0);},[]);
+  const nav=useCallback((pg: string, p: string | null = null)=>{setRoute(pg);setParam(p);setMenuOpen(false);window.scrollTo(0,0);window.history.pushState({route:pg,param:p},"",`/${pg==="home"?"":pg}${p?"/"+p:""}`);},[]);
+
+  useEffect(()=>{
+    const onPop=(e: PopStateEvent)=>{
+      if(e.state){setRoute(e.state.route||"home");setParam(e.state.param||null);}
+      else{setRoute("home");setParam(null);}
+    };
+    window.history.replaceState({route:"home",param:null},"","/");
+    window.addEventListener("popstate",onPop);
+    return ()=>window.removeEventListener("popstate",onPop);
+  },[]);
   const items=[{id:"home",l:"Forsíða"},{id:"thjonusta",l:"Þjónusta"},{id:"heilsufarsmat",l:"Heilsufarsmat"},{id:"byrding",l:"Byrðing"},{id:"retainer",l:"Samningar"},{id:"um",l:"Um okkur"}];
 
   return (
