@@ -1,3 +1,15 @@
+/**
+ * ICELANDIC LANGUAGE QA
+ * Before production launch, run ALL Icelandic text through:
+ * - yfirlestur.is (online) or yfirlestur.is/correct.api (API)
+ * - BÍN (bin.arnastofnun.is) for compound word verification
+ *
+ * Known patterns to watch:
+ * - Dative vs accusative case errors
+ * - Invented compound words not in BÍN
+ * - Consistent use of ð, þ, æ, ö, á, é, í, ó, ú, ý
+ */
+
 export const FF = "'DM Serif Display', Georgia, serif";
 
 export interface AssessmentOption {

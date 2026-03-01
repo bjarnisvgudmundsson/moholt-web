@@ -5,6 +5,7 @@ import {
   FF, ASSESSMENT_SECTIONS, MATURITY_LEVELS, SERVICE_PACKAGES,
   RETAINERS, BYRDING_FLOWS, CSAT_Q, WORKSHOPS, card, hoverCard, unhoverCard,
 } from "@/lib/data";
+import OrderForm from "@/components/OrderForm";
 
 /* ═══════════════════════════════════════════════════════════════
    COOKIE CONSENT BANNER
@@ -52,7 +53,14 @@ function CSATWidget({ context, contextId, contextTitle, onClose }: { context: st
             {q.type==="text"&&<textarea value={answers[q.id]||""} onChange={e=>set(q.id,e.target.value)} rows={3} placeholder="Frjáls athugasemd..." style={{ width:"100%", borderRadius:8, border:"1px solid #d1d5db", padding:"10px 12px", fontSize:14, resize:"vertical", fontFamily:"inherit", boxSizing:"border-box" }} />}
           </div>
         ))}
-        <button onClick={()=>{console.log("CSAT:",{context,contextId,answers,ts:new Date().toISOString()});setSubmitted(true);}} style={{ padding:"12px 24px", background:"#1e293b", color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:15, cursor:"pointer", alignSelf:"flex-start" }}>Senda svör</button>
+        <button onClick={()=>{
+          fetch("/api/csat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ context, contextId, contextTitle, answers, ts: new Date().toISOString() }),
+          }).catch(() => {});
+          setSubmitted(true);
+        }} style={{ padding:"12px 24px", background:"#1e293b", color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:15, cursor:"pointer", alignSelf:"flex-start" }}>Senda svör</button>
       </div>
     </div>
   );
@@ -160,7 +168,14 @@ function HeilsufarsmatPage() {
     else insights.push({icon:"✓",cls:"ok",t:"Sterk tæknigeta",b:"Kerfið er nútímalegt. Næsta skref: nýta grunninn með AI."});
 
     setResults({total,level,dims,recs,insights,levelIdx:MATURITY_LEVELS.indexOf(level),notes});
-    console.log("HEILSUFARSMAT:",{answers,notes,total,level:level.label,dims,ts:new Date().toISOString()});
+
+    // Send to API
+    fetch("/api/heilsufarsmat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers, notes, total, level: level.label, dims, ts: new Date().toISOString() }),
+    }).catch(() => {}); // fire and forget — don't block results display
+
     setPhase("results");
   };
 
@@ -394,6 +409,7 @@ function SkilmalarPage() {
    ═══════════════════════════════════════════════════════════════ */
 function VinnustofurPage({ nav }: { nav: (pg: string, p?: string | null) => void }) {
   const [workshop, setWorkshop] = useState<typeof WORKSHOPS[0] | null>(null);
+  const [showOrder, setShowOrder] = useState(false);
   const [filter, setFilter] = useState("all");
   const cats = [{id:"all",l:"Allar"},{id:"ai",l:"AI & Greining"},{id:"compliance",l:"Reglufylgni"},{id:"ux",l:"UX & Samþætting"},{id:"advisory",l:"Ráðgjöf"}];
   const list = filter === "all" ? WORKSHOPS : WORKSHOPS.filter((w: any) => w.category === filter);
@@ -467,11 +483,15 @@ function VinnustofurPage({ nav }: { nav: (pg: string, p?: string | null) => void
       )}
 
       {/* CTA */}
-      <div style={{ background:"#1e293b", borderRadius:12, padding:"40px 32px", textAlign:"center", color:"white" }}>
-        <h3 style={{ fontFamily:FF, fontSize:20, color:"#c8a96e", marginBottom:8 }}>Skráðu þig á vinnustofu</h3>
-        <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, maxWidth:480, margin:"0 auto 24px" }}>Hafðu samband og við finnum dagsetningu sem hentar. Vinnustofan er haldin hjá ykkur, með ykkar gögnum.</p>
-        <a href={`mailto:bjarni@moholt.is?subject=${encodeURIComponent(workshop.title)}%20-%20Skráning`} style={{ display:"inline-block", background:"#c8a96e", color:"#1e293b", fontFamily:FF, fontSize:15, fontWeight:700, padding:"14px 36px", borderRadius:4, textDecoration:"none" }}>Hafa samband</a>
-      </div>
+      {!showOrder ? (
+        <div style={{ background:"#1e293b", borderRadius:12, padding:"40px 32px", textAlign:"center", color:"white" }}>
+          <h3 style={{ fontFamily:FF, fontSize:20, marginBottom:8 }}>Skráðu þig á vinnustofu</h3>
+          <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, maxWidth:480, margin:"0 auto 24px" }}>Hafðu samband og við finnum dagsetningu sem hentar. Vinnustofan er haldin hjá ykkur, með ykkar gögnum.</p>
+          <button onClick={() => setShowOrder(true)} style={{ padding:"14px 36px", background:"white", color:"#1e293b", fontFamily:FF, fontSize:15, fontWeight:700, border:"none", borderRadius:4, cursor:"pointer" }}>Skrá mig á vinnustofu</button>
+        </div>
+      ) : (
+        <OrderForm type="workshop" packageId={workshop.id} packageTitle={workshop.title} onClose={() => setShowOrder(false)} showAttendees showDatePreference />
+      )}
     </div>
   );
 
@@ -499,6 +519,34 @@ function VinnustofurPage({ nav }: { nav: (pg: string, p?: string | null) => void
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Bundle Offers */}
+      <div style={{ marginTop:40 }}>
+        <h3 style={{ fontFamily:FF, fontSize:20, marginBottom:16 }}>Pakkasérboð</h3>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+          <div style={{ ...card }}>
+            <div style={{ fontSize:11, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:8 }}>Byrjendapakki</div>
+            <h4 style={{ fontFamily:FF, fontSize:18, color:"#1e293b", marginBottom:8 }}>3 vinnustofur að eigin vali</h4>
+            <p style={{ fontSize:14, color:"#64748b", lineHeight:1.6, marginBottom:16 }}>Veldu þrjár vinnustofur og fáðu 20% afslátt. Sameiginlegt lærdómsskjal fylgir.</p>
+            <div style={{ display:"flex", alignItems:"baseline", gap:8 }}>
+              <span style={{ fontFamily:FF, fontSize:22, color:"#1e293b" }}>frá 840.000 ISK</span>
+              <span style={{ fontSize:12, color:"#94a3b8", textDecoration:"line-through" }}>1.050.000 ISK</span>
+            </div>
+            <div style={{ fontSize:12, color:"#059669", fontWeight:600, marginTop:4 }}>20% afsláttur</div>
+          </div>
+          <div style={{ ...card, border:"1px solid #1e293b", position:"relative", overflow:"hidden" }}>
+            <div style={{ position:"absolute", top:12, right:-28, background:"#1e293b", color:"white", fontSize:10, fontWeight:700, padding:"3px 32px", transform:"rotate(45deg)", textTransform:"uppercase", letterSpacing:1 }}>Best</div>
+            <div style={{ fontSize:11, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:8 }}>Umbreytingarferðalag</div>
+            <h4 style={{ fontFamily:FF, fontSize:18, color:"#1e293b", marginBottom:8 }}>Allar 7 vinnustofur</h4>
+            <p style={{ fontSize:14, color:"#64748b", lineHeight:1.6, marginBottom:16 }}>Heildaryfirlit yfir alla þætti. Stjórnendaskýrsla og kynning fylgja.</p>
+            <div style={{ display:"flex", alignItems:"baseline", gap:8 }}>
+              <span style={{ fontFamily:FF, fontSize:22, color:"#1e293b" }}>1.925.000 ISK</span>
+              <span style={{ fontSize:12, color:"#94a3b8", textDecoration:"line-through" }}>2.750.000 ISK</span>
+            </div>
+            <div style={{ fontSize:12, color:"#059669", fontWeight:600, marginTop:4 }}>30% afsláttur</div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -537,6 +585,16 @@ function HomePage({ nav }: { nav: (page: string, param?: string | null) => void 
         </div>
         <button onClick={()=>nav("thjonusta")} style={{ marginTop:16, padding:"10px 20px", background:"none", border:"1px solid #d1d5db", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:500, color:"#64748b" }}>Sjá alla {SERVICE_PACKAGES.length} pakka →</button>
       </div>
+
+      {/* Free consultation CTA */}
+      <div style={{ ...card, background:"#f8fafc", marginBottom:48, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
+        <div>
+          <h3 style={{ fontFamily:FF, fontSize:18, color:"#1e293b", marginBottom:4 }}>Ekki viss hvar á að byrja?</h3>
+          <p style={{ fontSize:14, color:"#64748b", maxWidth:400 }}>Bókaðu ókeypis 15 mínútna símtal þar sem við skoðum stöðuna og mælum með réttri leið — án skuldbindingar.</p>
+        </div>
+        <a href="mailto:bjarni@moholt.is?subject=Ókeypis ráðgjöf – 15 mín." style={{ padding:"12px 28px", background:"#1e293b", color:"white", borderRadius:8, fontWeight:600, fontSize:14, textDecoration:"none", whiteSpace:"nowrap" }}>Bóka 15 mín. símtal</a>
+      </div>
+
       {/* 3-col feature cards */}
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16 }}>
         <div onClick={()=>nav("heilsufarsmat")} style={{ background:"linear-gradient(135deg,#2d5a6b,#1e293b)", borderRadius:12, padding:28, color:"white", cursor:"pointer", transition:"transform .2s" }} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
@@ -562,6 +620,7 @@ function HomePage({ nav }: { nav: (page: string, param?: string | null) => void 
 function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | null) => void; slug: string | null }) {
   const [pkg,setPkg]=useState(slug?SERVICE_PACKAGES.find((p: any)=>p.slug===slug):null);
   const [csat,setCsat]=useState(false);
+  const [showOrder, setShowOrder] = useState(false);
   const [filter,setFilter]=useState("all");
   const cats=[{id:"all",l:"Allt"},{id:"ai",l:"AI & Greining"},{id:"compliance",l:"Reglufylgni"},{id:"ux",l:"UX & Samþætting"},{id:"advisory",l:"Ráðgjöf"}];
   const list=filter==="all"?SERVICE_PACKAGES:SERVICE_PACKAGES.filter((p: any)=>p.category===filter);
@@ -583,9 +642,21 @@ function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | nul
       <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:32 }}>{pkg.deliverables.map((d: any, i: number)=>(<div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}><div style={{ width:20, height:20, borderRadius:6, background:pkg.color+"18", color:pkg.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, flexShrink:0, marginTop:2 }}>{i+1}</div><span style={{ fontSize:14, color:"#334155", lineHeight:1.5 }}>{d}</span></div>))}</div>
       <h3 style={{ fontFamily:FF, fontSize:18, marginBottom:16 }}>Verkáfangar</h3>
       <div style={{ display:"flex", gap:0, marginBottom:32 }}>{pkg.phases.map((ph: any, i: number)=>(<div key={i} style={{ flex:1 }}><div style={{ height:4, background:i===0?pkg.color:"#e2e8f0", borderRadius:i===0?"2px 0 0 2px":i===pkg.phases.length-1?"0 2px 2px 0":0 }} /><div style={{ fontSize:12, fontWeight:500, color:"#64748b", marginTop:8, paddingRight:8 }}>{ph}</div></div>))}</div>
-      <div style={{ display:"flex", gap:12, marginBottom:32 }}>
-        {BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id))&&<button onClick={()=>{const f=BYRDING_FLOWS.find((b: any)=>b.forPackages.includes(pkg.id));if(f)nav("byrding",f.slug);}} style={{ padding:"12px 24px", background:pkg.color, color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>Hefja byrðingu →</button>}
+      <div style={{ display:"flex", gap:12, marginBottom:32, flexWrap:"wrap" }}>
+        <button onClick={() => setShowOrder(!showOrder)} style={{ padding:"12px 24px", background:"#1e293b", color:"white", border:"none", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>
+          {showOrder ? "Fela eyðublað" : "Panta þjónustu"}
+        </button>
+        {BYRDING_FLOWS.find((b: any) => b.forPackages.includes(pkg.id)) && (
+          <button onClick={() => { const f = BYRDING_FLOWS.find((b: any) => b.forPackages.includes(pkg.id)); if (f) nav("byrding", f.slug); }} style={{ padding:"12px 24px", background:"white", color:"#64748b", border:"1px solid #d1d5db", borderRadius:8, fontWeight:600, fontSize:14, cursor:"pointer" }}>
+            Hefja undirbúning →
+          </button>
+        )}
       </div>
+      {showOrder && (
+        <div style={{ marginBottom:32 }}>
+          <OrderForm type="service" packageId={pkg.id} packageTitle={pkg.title} onClose={() => setShowOrder(false)} />
+        </div>
+      )}
       {/* Cross-sell: related workshop */}
       {WORKSHOPS.filter((w: any) => w.relatedPackages.includes(pkg.id)).length > 0 && (
         <div style={{ ...card, background:"#f8fafc", marginBottom:32 }}>
@@ -625,6 +696,7 @@ function ThjonustuPage({ nav, slug }: { nav: (page: string, param?: string | nul
 
 function RetainerPage() {
   const [csatId,setCsatId]=useState(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
   return (
     <div>
       <div style={{ marginBottom:32 }}><div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"#64748b", marginBottom:4 }}>Ráðgjafasamningar</div><h2 style={{ fontFamily:FF, fontSize:32, color:"#0f172a", marginBottom:8 }}>Mánaðarlegir samningar</h2><p style={{ color:"#64748b", maxWidth:520 }}>Stöðugur aðgangur að sérfræðiráðgjöf.</p></div>
@@ -636,8 +708,16 @@ function RetainerPage() {
           <div style={{ fontSize:13, color:r.color, fontWeight:500, marginBottom:16 }}>{t.hours} klst./mán.</div>
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>{t.features.map((f: any, j: number)=><div key={j} style={{ display:"flex", gap:8, alignItems:"flex-start", fontSize:13, color:"#475569" }}><span style={{ color:r.color, fontWeight:700, flexShrink:0 }}>✓</span>{f}</div>)}</div>
         </div>);})}</div>
-        <button onClick={()=>setCsatId(csatId===r.id?null:r.id)} style={{ padding:"8px 16px", background:"none", border:"1px solid #d1d5db", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:500, color:"#64748b" }}>{csatId===r.id?"Fela":"Gefa endurgjöf"}</button>
-        {csatId===r.id&&<div style={{ marginTop:16 }}><CSATWidget context="retainer" contextId={r.id} contextTitle={r.title} onClose={()=>setCsatId(null)} /></div>}
+        <div style={{ display:"flex", gap:12, marginBottom:16 }}>
+          <button onClick={() => setOrderId(orderId === r.id ? null : r.id)} style={{ padding:"8px 16px", background:orderId === r.id ? "#64748b" : "#1e293b", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:600 }}>
+            {orderId === r.id ? "Fela" : "Hefja samning"}
+          </button>
+        </div>
+        {orderId === r.id && (
+          <div style={{ marginBottom:24 }}>
+            <OrderForm type="retainer" packageId={r.id} packageTitle={r.title} onClose={() => setOrderId(null)} />
+          </div>
+        )}
       </div>))}
       <div style={{ ...card, background:"#f8fafc" }}><h4 style={{ fontFamily:FF, fontSize:16, marginBottom:8 }}>Hvers vegna ráðgjafasamningur?</h4><p style={{ fontSize:14, color:"#64748b", lineHeight:1.6 }}>Samanborið við tímakaup (25.000–35.000 ISK/klst.) sparar samningur 15–30% og tryggir forgangsaðgang og fyrirsjáanlegan kostnað.</p></div>
     </div>
