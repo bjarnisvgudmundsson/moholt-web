@@ -188,14 +188,14 @@ function HeilsufarsmatPage() {
     return (
       <div>
         <div style={{ background:"#1e293b", borderRadius:12, padding:"48px 32px", textAlign:"center", color:"white", marginBottom:32 }}>
-          <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"#c8a96e", marginBottom:16 }}>Heilsufarsmat Málastjórnunar · Móholt ehf.</div>
-          <div style={{ fontFamily:FF, fontSize:64, fontWeight:700, lineHeight:1 }}>{R.total}<span style={{ fontSize:24, color:"#c8a96e" }}>/80</span></div>
-          <div style={{ fontFamily:FF, fontSize:24, color:"#c8a96e", margin:"8px 0" }}>Þrep: {R.level.label}</div>
+          <div style={{ fontSize:11, textTransform:"uppercase", letterSpacing:2, color:"rgba(255,255,255,.5)", marginBottom:16 }}>Heilsufarsmat Málastjórnunar · Móholt ehf.</div>
+          <div style={{ fontFamily:FF, fontSize:64, fontWeight:700, lineHeight:1 }}>{R.total}<span style={{ fontSize:24, color:"rgba(255,255,255,.4)" }}>/80</span></div>
+          <div style={{ fontFamily:FF, fontSize:24, color:"rgba(255,255,255,.7)", margin:"8px 0" }}>Þrep: {R.level.label}</div>
           <p style={{ color:"rgba(255,255,255,.6)", maxWidth:500, margin:"0 auto", fontSize:14 }}>{R.level.desc}</p>
           {/* Gauge */}
           <div style={{ display:"flex", maxWidth:400, margin:"24px auto 0", gap:2 }}>
             {MATURITY_LEVELS.map((_: any, i: number)=>(
-              <div key={i} style={{ flex:1, height:6, borderRadius:3, background:i<R.levelIdx?"#c8a96e":i===R.levelIdx?"rgba(200,169,110,.5)":"rgba(255,255,255,.1)" }} />
+              <div key={i} style={{ flex:1, height:6, borderRadius:3, background:i<R.levelIdx?"rgba(255,255,255,.6)":i===R.levelIdx?"rgba(255,255,255,.3)":"rgba(255,255,255,.1)" }} />
             ))}
           </div>
           <div style={{ display:"flex", justifyContent:"space-between", maxWidth:400, margin:"6px auto 0" }}>
@@ -209,12 +209,12 @@ function HeilsufarsmatPage() {
               <div style={{ fontSize:12, fontWeight:600, color:"#64748b", marginBottom:8 }}>{k} · {d.name}</div>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
                 <span style={{ fontFamily:FF, fontSize:24 }}>{d.score}<span style={{ fontSize:14, color:"#94a3b8" }}>/{d.max}</span></span>
-                <span style={{ fontSize:11, padding:"3px 8px", borderRadius:4, fontWeight:600, background:d.pct<40?"#fef2f2":d.pct<60?"#fffbeb":d.pct<80?"#eff6ff":"#f0fdf4", color:d.pct<40?"#dc2626":d.pct<60?"#d97706":d.pct<80?"#2563eb":"#059669" }}>
+                <span style={{ fontSize:11, padding:"3px 8px", borderRadius:4, fontWeight:600, background:"#f1f5f9", color:"#475569" }}>
                   {d.pct<40?"Veikt":d.pct<60?"Miðlungs":d.pct<80?"Gott":"Sterkt"}
                 </span>
               </div>
               <div style={{ height:6, background:"#e2e8f0", borderRadius:3, overflow:"hidden" }}>
-                <div style={{ height:"100%", width:`${d.pct}%`, background:d.color, borderRadius:3, transition:"width .5s" }} />
+                <div style={{ height:"100%", width:`${d.pct}%`, background:"#1e293b", borderRadius:3, transition:"width .5s" }} />
               </div>
             </div>
           ))}
@@ -224,7 +224,7 @@ function HeilsufarsmatPage() {
         <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
           {R.insights.map((ins: any, i: number)=>(
             <div key={i} style={{ ...card, display:"flex", gap:16, alignItems:"flex-start" }}>
-              <div style={{ width:36, height:36, borderRadius:8, background:ins.cls==="warn"?"#fef2f2":ins.cls==="ok"?"#f0fdf4":"#eff6ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{ins.icon}</div>
+              <div style={{ width:36, height:36, borderRadius:8, background:"#f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{ins.icon}</div>
               <div><strong style={{ fontSize:14 }}>{ins.t}</strong><p style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{ins.b}</p></div>
             </div>
           ))}
@@ -234,19 +234,19 @@ function HeilsufarsmatPage() {
         <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
           {R.recs.map((r: any, i: number)=>(
             <div key={i} style={{ ...card, display:"flex", gap:16, alignItems:"flex-start" }}>
-              <div style={{ fontFamily:FF, fontSize:24, color:"#c8a96e", fontWeight:700, flexShrink:0, width:32 }}>0{i+1}</div>
+              <div style={{ fontFamily:FF, fontSize:24, color:"#94a3b8", fontWeight:700, flexShrink:0, width:32 }}>0{i+1}</div>
               <div><strong style={{ fontSize:14 }}>{r.t}</strong><p style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{r.b}</p></div>
             </div>
           ))}
         </div>
         {/* CTA */}
         <div style={{ background:"#1e293b", borderRadius:12, padding:"40px 32px", textAlign:"center", color:"white" }}>
-          <h3 style={{ fontFamily:FF, fontSize:20, color:"#c8a96e", marginBottom:8 }}>Langar þig að ræða þetta nánar?</h3>
+          <h3 style={{ fontFamily:FF, fontSize:20, color:"white", marginBottom:8 }}>Langar þig að ræða þetta nánar?</h3>
           <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, maxWidth:480, margin:"0 auto 24px" }}>Við bjóðum upp á stuttan, 30 mínútna, endurgjafafund þar sem við förum yfir niðurstöðurnar – án skuldbindingar.</p>
           {R.notes&&Object.values(R.notes).filter(Boolean).length>0&&(
             <p style={{ color:"rgba(255,255,255,.4)", fontSize:12, marginBottom:16 }}>Þú bættir við athugasemdum við {Object.values(R.notes).filter(Boolean).length} spurningar – þær verða hluti af endurgjöfinni.</p>
           )}
-          <a href="mailto:bjarni@moholt.is?subject=Heilsufarsmat%20-%20Endurgjafafundur" style={{ display:"inline-block", background:"#c8a96e", color:"#1e293b", fontFamily:FF, fontSize:15, fontWeight:700, padding:"14px 36px", borderRadius:4, textDecoration:"none" }}>Bóka endurgjafafund</a>
+          <a href="mailto:bjarni@moholt.is?subject=Heilsufarsmat%20-%20Endurgjafafundur" style={{ display:"inline-block", background:"white", color:"#1e293b", fontFamily:FF, fontSize:15, fontWeight:700, padding:"14px 36px", borderRadius:4, textDecoration:"none" }}>Bóka endurgjafafund</a>
           <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:12 }}>Engin skuldbinding. Við seljum ekki gögn þín til þriðja aðila.</div>
         </div>
       </div>
@@ -670,11 +670,21 @@ export default function MoholtApp() {
   const nav=useCallback((pg: string, p: string | null = null)=>{setRoute(pg);setParam(p);setMenuOpen(false);window.scrollTo(0,0);window.history.pushState({route:pg,param:p},"",`/${pg==="home"?"":pg}${p?"/"+p:""}`);},[]);
 
   useEffect(()=>{
+    // Read initial route from URL
+    const path = window.location.pathname.replace(/^\//, "") || "home";
+    const parts = path.split("/");
+    const initialRoute = parts[0] || "home";
+    const initialParam = parts[1] || null;
+    if (initialRoute !== "home") {
+      setRoute(initialRoute);
+      setParam(initialParam);
+    }
+
     const onPop=(e: PopStateEvent)=>{
       if(e.state){setRoute(e.state.route||"home");setParam(e.state.param||null);}
       else{setRoute("home");setParam(null);}
     };
-    window.history.replaceState({route:"home",param:null},"","/");
+    window.history.replaceState({route:initialRoute,param:initialParam},"",window.location.pathname);
     window.addEventListener("popstate",onPop);
     return ()=>window.removeEventListener("popstate",onPop);
   },[]);
